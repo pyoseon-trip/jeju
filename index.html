@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0D1F26">
+<title>제주 코스 · 표선 베이스</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--sea:#0D1F26;--paper:#F2F1EC;--ink:#0D1F26;--line:rgba(13,31,38,.12);--teal:#3E8F86}
+html,body{margin:0;padding:0}
+body{font-family:'IBM Plex Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;font-weight:300;
+ background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased}
+#app{max-width:520px;margin:0 auto;padding-bottom:50px}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+button,input,textarea,select{font-family:inherit}
+a{color:inherit}
+
+.top{background:var(--sea);color:#EAF2F0;padding:12px 15px;display:flex;justify-content:space-between;
+ align-items:center;gap:10px;padding-top:calc(12px + env(safe-area-inset-top))}
+.top h1{margin:0;font-size:14px;font-weight:500}
+.top p{margin:3px 0 0;font-size:10px;color:rgba(234,242,240,.5)}
+.addbtn{border:1px solid rgba(255,255,255,.3);background:transparent;color:#EAF2F0;font-size:11.5px;
+ padding:8px 11px;border-radius:3px;cursor:pointer;white-space:nowrap}
+
+.mapwrap{background:var(--sea);line-height:0;position:relative}
+.mapwrap svg{width:100%;height:auto;display:block}
+.zoom{position:absolute;right:9px;top:9px;display:flex;flex-direction:column;gap:5px}
+.zoom button{border:0;cursor:pointer;font-size:10.5px;font-weight:500;background:rgba(255,255,255,.14);
+ color:#EAF2F0;padding:7px 10px;border-radius:3px}
+.zoom button[aria-pressed="true"]{background:#EAF2F0;color:#0D1F26}
+
+.chips{display:flex;gap:6px;padding:11px 15px;overflow-x:auto;border-bottom:1px solid var(--line);
+ -webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{cursor:pointer;font-size:12.5px;font-weight:500;white-space:nowrap;border:1px solid var(--line);
+ background:transparent;color:rgba(13,31,38,.45);padding:8px 13px;border-radius:999px}
+.chip[aria-pressed="true"]{border-color:transparent;color:#0D1F26}
+
+.days{display:flex;gap:6px;padding:11px 15px 0}
+.day{flex:1;cursor:pointer;font-size:12.5px;font-weight:500;border:1px solid var(--line);
+ background:transparent;color:rgba(13,31,38,.45);padding:10px 4px;border-radius:3px}
+.day[aria-pressed="true"]{color:#fff;border-color:transparent}
+
+.body{padding:0 15px}
+.card{background:#fff;border:1px solid var(--line);border-radius:5px;padding:14px;margin:14px 0}
+.card h2{margin:0;font-size:17px;font-weight:500;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tagr{font-size:11px;background:rgba(62,143,134,.14);color:#1F6A63;padding:2px 6px;border-radius:2px}
+.tagu{font-size:10.5px;background:rgba(183,155,224,.22);color:#5B3E86;padding:2px 6px;border-radius:2px}
+.sub{font-size:11px;color:rgba(13,31,38,.5);margin-top:6px;line-height:1.6}
+.desc{font-size:13px;line-height:1.7;margin:10px 0 0}
+.warn{display:inline-block;margin-top:9px;font-size:11px;background:rgba(255,194,77,.25);
+ border-left:3px solid #FFC24D;padding:5px 8px;color:#6B4C08;border-radius:0 2px 2px 0}
+.acts{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.b{cursor:pointer;font-size:12px;text-decoration:none;display:inline-block;border:1px solid var(--line);
+ background:transparent;color:rgba(13,31,38,.75);padding:10px 13px;border-radius:3px}
+.b.pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+.b.danger{background:#fff;color:#B04A3A;border-color:#E6C2BC}
+
+.h{font-size:10.5px;letter-spacing:.18em;color:var(--teal);margin:22px 0 8px}
+.row{display:flex;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);
+ width:100%;text-align:left;background:none;border-left:0;border-right:0;border-top:0;cursor:pointer}
+.dot{flex:0 0 22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+ font-size:10px;color:#0D1F26;font-weight:500}
+.dot.sq{border-radius:3px}
+.n{font-size:13.5px;font-weight:500;display:block}
+.m{font-size:10.5px;color:rgba(13,31,38,.45);margin-top:2px;display:block}
+.rt{margin-left:auto;font-size:11px;color:rgba(13,31,38,.5);white-space:nowrap;text-align:right}
+.leg{padding:5px 0 5px 32px;font-size:11px;color:rgba(13,31,38,.45)}
+.empty{font-size:12.5px;line-height:1.75;color:rgba(13,31,38,.45);padding:18px 0;text-align:center}
+.sum{background:var(--sea);color:#EAF2F0;border-radius:5px;padding:13px 14px;margin-top:12px}
+.sum b{font-size:15px;font-weight:500}
+.sum span{display:block;font-size:11px;color:rgba(234,242,240,.55);margin-top:3px;line-height:1.6}
+.foot{font-size:11px;line-height:1.85;color:rgba(13,31,38,.42);margin-top:26px;padding-top:14px;
+ border-top:1px solid var(--line)}
+.ord{border:1px solid var(--line);background:#fff;border-radius:3px;width:30px;height:30px;
+ font-size:14px;cursor:pointer;color:rgba(13,31,38,.6);line-height:1}
+
+.form label{display:block;font-size:10.5px;letter-spacing:.1em;color:rgba(13,31,38,.5);margin:13px 0 5px}
+.form input,.form textarea{width:100%;font-size:16px;font-weight:300;border:1px solid var(--line);
+ border-radius:3px;padding:11px;background:#fff;color:var(--ink)}
+.form textarea{min-height:64px;resize:vertical;line-height:1.6}
+.form input:focus,.form textarea:focus{outline:2px solid var(--teal);outline-offset:-1px}
+.cats{display:flex;gap:6px;flex-wrap:wrap}
+.cat{cursor:pointer;font-size:12.5px;border:1px solid var(--line);background:#fff;padding:9px 13px;
+ border-radius:999px;color:rgba(13,31,38,.5);font-weight:500}
+.cat[aria-pressed="true"]{border-color:transparent;color:#0D1F26}
+.note{font-size:11px;line-height:1.7;color:rgba(13,31,38,.5);margin-top:7px;background:rgba(62,143,134,.09);
+ padding:9px 10px;border-radius:3px}
+.two{display:flex;gap:6px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ═══════════ 투영 ═══════════ */
+var LON0=126.14,LON1=127.0,LAT0=33.17,LAT1=33.58,W=860,H=490;
+function px(l){return (l-LON0)/(LON1-LON0)*W}
+function py(l){return (LAT1-l)/(LAT1-LAT0)*H}
+
+var COAST=[[33.516,126.512],[33.522,126.545],[33.527,126.583],[33.540,126.635],[33.549,126.669],
+[33.556,126.720],[33.560,126.760],[33.556,126.796],[33.545,126.833],[33.527,126.865],
+[33.510,126.897],[33.487,126.925],[33.462,126.945],[33.440,126.938],[33.421,126.930],
+[33.412,126.910],[33.395,126.895],[33.362,126.870],[33.325,126.840],[33.302,126.808],
+[33.288,126.760],[33.272,126.716],[33.263,126.660],[33.250,126.620],[33.243,126.570],
+[33.235,126.520],[33.238,126.470],[33.239,126.418],[33.232,126.365],[33.228,126.320],
+[33.221,126.295],[33.199,126.284],[33.203,126.262],[33.223,126.240],[33.245,126.204],
+[33.276,126.168],[33.310,126.163],[33.343,126.185],[33.381,126.220],[33.394,126.240],
+[33.410,126.270],[33.437,126.305],[33.462,126.350],[33.478,126.400],[33.489,126.440],
+[33.503,126.475],[33.512,126.500]];
+var COASTPATH=COAST.map(function(p,i){return (i?"L":"M")+px(p[1]).toFixed(1)+","+py(p[0]).toFixed(1)}).join(" ")+" Z";
+
+/* ═══════════ 제주 지명 사전 ═══════════ */
+var GAZ=[["하천리",33.352,126.815],["표선리",33.325,126.840],["가시리",33.370,126.780],["가시로",33.330,126.821],
+["성읍",33.386,126.800],["표선면",33.330,126.830],["성산리",33.460,126.933],["오조리",33.465,126.918],
+["고성리",33.443,126.918],["신양",33.428,126.925],["온평",33.408,126.900],["삼달",33.375,126.850],
+["신천",33.362,126.870],["신고로",33.438,126.917],["한도로",33.469,126.935],["일출로",33.458,126.940],
+["성산읍",33.440,126.910],["위미",33.272,126.665],["신례",33.270,126.640],["하례",33.263,126.615],
+["수망",33.340,126.690],["남원읍",33.278,126.712],["상계로",33.264,126.390],["중문",33.253,126.420],
+["예래",33.246,126.390],["강정",33.235,126.494],["대륜동",33.244,126.500],["동홍동",33.256,126.570],
+["서홍동",33.257,126.550],["칠십리로",33.246,126.578],["이어도로",33.242,126.519],["서귀동",33.246,126.565],
+["사계",33.230,126.315],["화순",33.240,126.335],["안덕면",33.250,126.330],["상모리",33.224,126.263],
+["하모",33.218,126.250],["모슬포",33.218,126.252],["대정읍",33.225,126.255],["한경면",33.320,126.180],
+["고산",33.293,126.170],["협재",33.394,126.240],["한림읍",33.410,126.267],["애월해안로",33.482,126.378],
+["애월읍",33.462,126.330],["애월",33.464,126.312],["조함해안로",33.542,126.670],["함덕",33.543,126.669],
+["조천읍",33.535,126.635],["월정",33.556,126.795],["평대",33.526,126.835],["세화",33.524,126.860],
+["해맞이해안로",33.545,126.820],["김녕",33.554,126.755],["한동",33.542,126.845],["종달",33.505,126.900],
+["송당",33.446,126.784],["비자숲길",33.484,126.806],["구좌읍",33.530,126.800],["우도",33.505,126.952],
+["연동",33.487,126.492],["노형",33.482,126.478],["신대로",33.491,126.496],["이도",33.494,126.535],
+["삼도",33.510,126.520],["용담",33.512,126.505],["용문로",33.504,126.503],["도두",33.503,126.470],
+["이호",33.496,126.457],["외도",33.492,126.435],["화북",33.518,126.573],["삼양",33.527,126.596],
+["아라",33.463,126.549],["오라",33.480,126.515],["도남",33.492,126.520],["건입동",33.514,126.535],
+["일도",33.514,126.545],["봉개",33.470,126.600],["일주서로",33.400,126.300],["일주동로",33.300,126.700],
+["서귀포",33.253,126.560],["제주시",33.500,126.531]];
+function geocode(addr){
+  if(!addr)return null;
+  var a=addr.replace(/\s/g,"");
+  for(var i=0;i<GAZ.length;i++){ if(a.indexOf(GAZ[i][0])>=0) return {lat:GAZ[i][1],lng:GAZ[i][2],area:GAZ[i][0]}; }
+  return null;
+}
+
+/* ═══════════ 숙소 ═══════════ */
+var BASE={id:"base",n:"숙소",cat:"base",lat:33.354,lng:126.818,
+ addr:"제주특별자치도 서귀포시 표선면 한마음초등로 616-8"};
+
+/* ═══════════ 기본 장소 (주소 기준) ═══════════ */
+var SEED=[
+{id:"r1",n:"제주OK렌트카 본점",cat:"car",addr:"제주시 용문로 64",lat:33.5039618,lng:126.5030977,pid:"ChIJp2OgDkf7DDURpTsEar8bdS0",stay:40,p:"064-743-4000",d:"공항에서 셔틀로 이동합니다. 반납 시 대여 시점 게이지만큼만 채우면 됩니다.",w:"07:00–22:00"},
+
+{id:"s1",n:"성산일출봉",r:4.7,cat:"sight",addr:"서귀포시 성산읍 일출로 284-12",lat:33.458056,lng:126.9425,pid:"ChIJn3jj9rkUDTURS7YjOgUyUVU",stay:70,d:"정상까지 계단 20~25분. 하산 때 해녀 공연장 쪽 절벽길로.",w:"입장 마감 19:00 전후"},
+{id:"s2",n:"비자림",r:4.6,cat:"sight",addr:"제주시 구좌읍 비자숲길 55",lat:33.484272,lng:126.8064793,pid:"ChIJF50tCzMXDTURJM1q9jLS7Xs",stay:60,d:"500~800년 비자나무 숲. 평지 2km, 한여름에도 시원합니다.",w:"09:00–18:00 · 3,000원"},
+{id:"s3",n:"용눈이오름",r:4.6,cat:"sight",addr:"제주시 구좌읍 종달리 산28",lat:33.4599676,lng:126.831477,pid:"ChIJl9073xgRDTUR2mwxz1DUvsg",stay:50,d:"능선이 부드러워 오르기 쉽고 조망이 시원합니다.",w:"그늘 없음 · 탐방 통제 확인"},
+{id:"s4",n:"따라비오름",r:4.6,cat:"sight",addr:"서귀포시 표선면 가시리 산62",lat:33.3870582,lng:126.7534582,pid:"ChIJ8y17IaQFDTURtXk_Q-WUOkc",stay:80,d:"숙소에서 가장 가까운 오름. 루프 3km, 정상만 30분.",w:"그늘 없음 · 진입로 좁음"},
+{id:"s5",n:"광치기해변",r:4.6,cat:"sight",addr:"서귀포시 성산읍 고성리 224-33",lat:33.4524144,lng:126.9246908,pid:"ChIJt9qlV5wUDTURB9zvFLKXrLg",stay:30,d:"일출봉이 정면으로 보이는 검은 모래 해변.",w:"무료 · 상시"},
+{id:"s6",n:"물영아리오름",r:4.5,cat:"sight",addr:"서귀포시 남원읍 수망리 산188",lat:33.3692294,lng:126.6935554,pid:"ChIJkzAEg1QBDTURvjZlYk6E4Ok",stay:90,d:"분화구에 습지가 고인 람사르 습지 오름.",w:"그늘 많음 · 계단 가파름"},
+{id:"s7",n:"아부오름",r:4.5,cat:"sight",addr:"제주시 구좌읍 송당리 산164-1",lat:33.447607,lng:126.7772601,pid:"ChIJPw-uGpwaDTURAXs4ANhXLSc",stay:50,d:"계단 2분이면 능선. 분화구 안 삼나무가 원형으로 심겨 있습니다.",w:"주차장 넓음"},
+{id:"s8",n:"정방폭포",r:4.5,cat:"sight",addr:"서귀포시 칠십리로214번길 37",lat:33.2448567,lng:126.5715794,pid:"ChIJ8afI-XNTDDURC7OZzyBO8KA",stay:50,d:"바다로 직접 떨어지는 폭포. 해녀 좌판은 현금만.",w:"09:00–17:20"},
+{id:"s9",n:"세화해변",r:4.5,cat:"sight",addr:"제주시 구좌읍 해녀박물관길 26",lat:33.5249646,lng:126.8598017,pid:"ChIJT0n_YzoXDTURcrZLa9grm4Y",stay:40,d:"검은 현무암과 흰 모래, 물빛 대비가 제주 최고 수준.",w:"간조 때 모래톱"},
+{id:"s10",n:"행원해변 (코난비치)",r:4.5,cat:"sight",addr:"제주시 구좌읍 행원리 575-6",lat:33.5575318,lng:126.8112241,pid:"ChIJkeFHN5wXDTUREQkuDYsoO3o",stay:35,d:"풍력발전기와 바다가 겹치는 비공식 해변.",w:"편의시설 없음"},
+{id:"s11",n:"함덕해수욕장",r:4.5,cat:"sight",addr:"제주시 조천읍 함덕리 1004",lat:33.5434231,lng:126.6697752,pid:"ChIJVSv3qq_8DDURcLh4pWxZ0vA",stay:60,d:"에메랄드 물빛에 시설이 잘 갖춰진 대형 해변.",w:"성수기 주차 혼잡"},
+{id:"s12",n:"우도",r:4.5,cat:"sight",addr:"제주시 우도면",lat:33.5042977,lng:126.954048,pid:"ChIJA_du00wVDTURisfAXXmN2fQ",stay:240,d:"성산항에서 배 15분. 반나절은 잡아야 합니다.",w:"배편 시간 확인"},
+
+{id:"c1",n:"오늘도 화창",r:4.9,cat:"cafe",addr:"제주시 구좌읍 월정5길 56",lat:33.5551539,lng:126.7950438,pid:"ChIJUzmaru0XDTURuCP2kghmnL0",stay:40,p:"010-5101-9518",d:"월정리 뒷골목. 당근케이크와 한라봉 소르베.",w:"10:00–19:00"},
+{id:"c2",n:"Dacone",r:4.9,cat:"cafe",addr:"제주시 구좌읍 평대4길 20-1",lat:33.5292344,lng:126.8367461,pid:"ChIJM7Kk9FUXDTURflbREn0uqEM",stay:40,p:"010-4125-2502",d:"평대리 정원 딸린 베이커리. 크넬아망과 마늘크림치즈빵.",w:"10:00–19:00"},
+{id:"c3",n:"NO VACATION",r:4.8,cat:"cafe",addr:"서귀포시 표선면 민속해안로 635",lat:33.3253764,lng:126.8377441,pid:"ChIJPwJWWgAPDTURSI4ejsAVQVM",stay:40,d:"표선해수욕장 앞. 미니멀한 공간에 커피가 좋습니다.",w:"화요일 휴무 · 18:00 마감"},
+{id:"c4",n:"해지개 카페",r:4.8,cat:"cafe",addr:"제주시 애월읍 애월북서길 52",lat:33.4642136,lng:126.3089572,pid:"ChIJkT_5s231DDURAxxjUhkTY8E",stay:50,p:"064-799-8585",d:"애월 풍력발전기 바다뷰. 소금빵과 흑임자 라떼. 빵이 일찍 소진됩니다.",w:"09:00–21:00"},
+{id:"c5",n:"서귀피안 베이커리",r:4.7,cat:"cafe",addr:"서귀포시 성산읍 신양로122번길 17",lat:33.4351951,lng:126.9222463,pid:"ChIJw6nBTRoTDTUR0ksyvvG-c2A",stay:50,p:"064-783-7884",d:"신양 바닷가 3층 베이커리. 말차 크루아상.",w:"08:00–20:00"},
+{id:"c6",n:"Graminée",r:4.7,cat:"cafe",addr:"서귀포시 서귀동 751-1",lat:33.2417564,lng:126.5662839,pid:"ChIJJzTpVRlTDDUR4Ml2-XBDmPY",stay:45,d:"서귀포항 루프탑. 베이글과 스콘.",w:"수요일 휴무"},
+{id:"c7",n:"woomee",r:4.7,cat:"cafe",addr:"서귀포시 남원읍 위미대성로 125-46",lat:33.2917359,lng:126.6757166,pid:"ChIJr7NyGA6rDTURDbLxrnAhOK0",stay:40,d:"위미 조용한 카페. 무스 디저트.",w:"화요일 휴무 · 리뷰 적음"},
+{id:"c8",n:"카페 드노아",r:4.6,cat:"cafe",addr:"서귀포시 남원읍 위미리 2160-2",lat:33.287288,lng:126.666317,pid:"ChIJ7xXSy7urDTURaxWYG2tuuiE",stay:45,d:"감귤밭 속 정원과 전망대.",w:"리뷰 적음"},
+{id:"c9",n:"해일리 베이커리 카페",r:4.6,cat:"cafe",addr:"서귀포시 성산읍 한도로 269-37",lat:33.4688722,lng:126.9354679,pid:"ChIJ_R20Ip4VDTURp-AxW5qnWk0",stay:45,p:"064-784-0099",d:"우도와 일출봉이 함께 보이는 자리.",w:"09:00–21:00"},
+{id:"c10",n:"Tokimoon",r:4.5,cat:"cafe",addr:"제주시 구좌읍 해맞이해안로 456",lat:33.5559284,lng:126.7955315,pid:"ChIJQVrvUfMXDTURK_peEsid5wc",stay:40,d:"월정리 루프탑. 말차 크림 라떼.",w:"09:00–22:00"},
+{id:"c11",n:"가는곶 세화",r:4.5,cat:"cafe",addr:"제주시 구좌읍 세화14길 3",lat:33.5205393,lng:126.8606225,pid:"ChIJtaSn8J8XDTUR41ne-rVsptY",stay:40,p:"064-782-9006",d:"세화 골목의 빵집 겸 카페.",w:"09:00–19:00"},
+{id:"c12",n:"카페 와랑와랑",r:4.5,cat:"cafe",addr:"서귀포시 남원읍 위미중앙로300번길 28",lat:33.2723619,lng:126.676564,pid:"ChIJTaVpgzeqDTURtmuzwN4E3nM",stay:50,p:"070-4656-1761",d:"위미 시골 마을. 드립커피와 구운 떡.",w:"수요일 휴무"},
+{id:"c13",n:"Today's Sea",r:4.5,cat:"cafe",addr:"서귀포시 이어도로 990",lat:33.2416342,lng:126.5186935,pid:"ChIJj4w4CTxRDDURU3Efd_05Vis",stay:40,d:"서귀포 해안도로 루프덱. 오트밀크 있음.",w:"08:00–22:00"},
+
+{id:"f1",n:"태평식당",r:5.0,cat:"food",addr:"서귀포시 서귀동 146-3",lat:33.2465444,lng:126.5680343,pid:"ChIJQ6n4GQBTDDURBNJRCtCSl4c",stay:70,p:"064-904-1119",d:"서귀포 갈비찜·감자탕. 국물 요리가 필요할 때.",w:"일요일 휴무"},
+{id:"f2",n:"서귀집",r:5.0,cat:"food",addr:"서귀포시 칠십리로 306",lat:33.2474755,lng:126.5852532,pid:"ChIJG3SAuEBTDDURExQ2tIDBu_c",stay:80,p:"064-904-1585",d:"서귀포 흑돼지. 사장님이 주방에서 초벌해 내옵니다.",w:"15:00–24:00 · 저녁만"},
+{id:"f3",n:"훈도 제주 흑돼지",r:4.9,cat:"food",addr:"제주시 애월읍 애월리 37",lat:33.4622121,lng:126.3123446,pid:"ChIJp612ESb1DDUREWRu339q3ak",stay:80,p:"010-4151-1888",d:"애월 바다 앞 흑돼지. 직원이 구워줍니다.",w:"11:00–23:00"},
+{id:"f4",n:"궤네깃도 중문흑돼지",r:4.9,cat:"food",addr:"서귀포시 일주서로 966",lat:33.2583323,lng:126.40761,pid:"ChIJDaUylAhbDDURB2B5cYs5NhY",stay:80,p:"010-6643-2157",d:"중문. 반찬으로 간장게장이 나오고 아이 놀이터가 있습니다.",w:"11:00–23:00"},
+{id:"f5",n:"소길국수",r:4.9,cat:"food",addr:"제주시 신대로 72",lat:33.4909478,lng:126.4964562,pid:"ChIJm0S2FgD7DDURp-crQGXGwyc",stay:45,d:"제주시 고기국수. 공항 가기 전 마지막 끼니로 좋습니다.",w:"08:00–16:00"},
+{id:"f6",n:"돌담흑돼지 (연동)",r:4.8,cat:"food",addr:"제주시 연동7길 35 2층",lat:33.486769,lng:126.4908622,pid:"ChIJvYqSg-v7DDURJ8kfsIcwjKE",stay:80,p:"064-742-6090",d:"제주시 연동. 반찬 셀프바가 있고 새벽 2시까지.",w:"11:00–02:00"},
+{id:"f7",n:"하여금 흑돼지",r:4.8,cat:"food",addr:"제주시 원노형4길 11",lat:33.4850855,lng:126.4824952,pid:"ChIJp9mW82T7DDUR9X5WiZYEwaI",stay:80,d:"노형동. 두껍게 썬 목살과 가브리살.",w:"12:00–24:00"},
+{id:"f8",n:"중문그때그집 숙성",r:4.8,cat:"food",addr:"서귀포시 상계로 181-28",lat:33.2641894,lng:126.3901466,pid:"ChIJF-cXnJBbDDURMQTaDfkuX74",stay:80,p:"064-784-9244",d:"중문 숙성 흑돼지. 반찬 무한 리필.",w:"09:50–23:00"},
+{id:"f9",n:"함덕고등어쌈밥",r:4.8,cat:"food",addr:"제주시 조천읍 조함해안로 530",lat:33.5425125,lng:126.6696539,pid:"ChIJR8EWwXofDTURsWTmdup3GV8",stay:60,p:"070-8211-2736",d:"함덕해변 3층. 전복미역국이 특히 좋습니다.",w:"09:00–21:30"},
+{id:"f10",n:"물고기자리",r:4.8,cat:"food",addr:"서귀포시 성산읍 성산리 145-6",lat:33.4611885,lng:126.9333042,pid:"ChIJ3x4P4hgVDTURcnYy5tRqpTQ",stay:90,p:"064-900-9642",d:"성산. 회·구이·튀김·전복탕 코스가 1인 3만원대.",w:"월요일 휴무 · 예약 권장"},
+{id:"f11",n:"갈치관 애월해안도로점",r:4.7,cat:"food",addr:"제주시 애월읍 애월해안로 686",lat:33.4819725,lng:126.3752439,pid:"ChIJFTrfWdH3DDURiSp0smqRamY",stay:70,d:"애월 해안도로. 갈치구이와 전복죽.",w:"10:00–21:00"},
+{id:"f12",n:"바당포구",r:4.7,cat:"food",addr:"서귀포시 대정읍 하모항구로 62-1",lat:33.2190004,lng:126.2511272,pid:"ChIJuZjfIVVpDDURX42ZYB8pzNg",stay:80,d:"모슬포항. 고등어회와 제주 벵에돔. 로컬만 아는 집.",w:"화요일 휴무"},
+{id:"f13",n:"동문시장고기국수",r:4.7,cat:"food",addr:"제주시 일도1동 1148-2",lat:33.5127431,lng:126.5283168,pid:"ChIJJysfZjjjDDURUocRtINoQHY",stay:40,p:"064-757-6055",d:"동문시장 12번 게이트. 돔베고기 얹은 고기국수 8,000원.",w:"08:00–18:00 · 주차 불편"},
+{id:"f14",n:"중문고등어쌈밥",r:4.7,cat:"food",addr:"서귀포시 일주서로 1240",lat:33.2648884,lng:126.3806793,pid:"ChIJXahjXqdbDDURvaV68VQyUoo",stay:60,p:"064-738-2457",d:"묵은지 고등어조림. 영어 태블릿 주문, 주차 넉넉.",w:"09:30–20:00"},
+{id:"f15",n:"광어다 표선 본점",r:4.6,cat:"food",addr:"서귀포시 표선면 세화리 181",lat:33.3039639,lng:126.8089208,pid:"ChIJlQ6V_pkJDTURQmhiZU5UtD0",stay:80,p:"064-787-8838",d:"표선. 광어 한 마리를 회·튀김·지리로.",w:"목요일 휴무 · 19:00 마감"},
+{id:"f16",n:"안녕, 전복",r:4.6,cat:"food",addr:"제주시 도두1동 1355",lat:33.4991362,lng:126.475806,pid:"ChIJ0fR4lrvlDDURAIqjHyl1lXU",stay:60,p:"010-9800-3282",d:"도두. 전복죽과 아보카도 비빔밥. 공항 활주로가 보입니다.",w:"목요일 휴무 · 대기 있음"},
+{id:"f17",n:"덜전복",r:4.6,cat:"food",addr:"제주시 도두항서길 53",lat:33.5052401,lng:126.4639129,pid:"ChIJL6zEAfH7DDUR3gpm6EAW_Zg",stay:60,d:"도두항. 전복 돌솥밥과 간장게장 반찬.",w:"10:00–21:00"},
+{id:"f18",n:"교래흑돼지 표선점",r:4.5,cat:"food",addr:"서귀포시 표선면 가시로 13",lat:33.3301299,lng:126.8208621,pid:"ChIJw-fnVBAPDTUREnZZ5L1OCTI",stay:70,p:"064-787-6338",d:"직원이 끝까지 구워줍니다. 멜젓 기본.",w:"수요일 휴무 · 예약 권장"},
+{id:"f19",n:"해왓",r:4.5,cat:"food",addr:"서귀포시 성산읍 신고로 30-1",lat:33.4384861,lng:126.9172371,pid:"ChIJMeKTq_UTDTURz39n1wgJhqQ",stay:60,p:"064-782-5689",d:"성산 갈치구이·성게미역국. 현지인 줄 서는 집.",w:"수요일 휴무"},
+{id:"f20",n:"미영이네",r:4.5,cat:"food",addr:"서귀포시 대정읍 하모리 770-29",lat:33.2177388,lng:126.2498932,pid:"ChIJAzVlLPdpDDURwtrd3yMUWnM",stay:70,p:"064-792-0077",d:"모슬포 고등어회 대표 격. 고등어구이도 꼭 시키세요.",w:"수요일 휴무"},
+{id:"f21",n:"제주광해 애월본점",r:4.5,cat:"food",addr:"제주시 애월읍 애월해안로 867",lat:33.4877605,lng:126.3904307,pid:"ChIJB0t1zSfxDDURnYEUbuKVTWs",stay:80,p:"064-713-4789",d:"애월 바다뷰 갈치정식. 대기 30분~1시간.",w:"10:00–20:00 · 라스트오더 19:00"},
+{id:"f22",n:"장인의집",r:4.5,cat:"food",addr:"제주시 애월읍 애월로19길 31",lat:33.4658022,lng:126.3268488,pid:"ChIJdwHdps71DDURi_FxVYc1ARU",stay:60,p:"064-799-1610",d:"애월. 해물뚝배기와 손만두. 자리가 적어 대기 있습니다.",w:"09:00–22:30"}
+];
+
+/* ═══════════ LPG ═══════════ */
+var LPGRAW=[
+{n:"유진가스충전소",addr:"서귀포시 표선면 번영로 3239",p:"064-787-0459",w:"06:30–20:00",lat:33.3590625,lng:126.8223413,pid:"ChIJEZXI1QIPDTUR3rOYVtZZ6tE",key:1},
+{n:"SK충전소 성산",addr:"서귀포시 성산읍 일주동로 4495",p:"064-784-7272",w:"06:00–23:00",lat:33.427582,lng:126.9076262,pid:"ChIJKcbySKYTDTURUuctVoAwZUk"},
+{n:"SK행복충전 성산동부",addr:"서귀포시 성산읍 오조리 656-1",p:"064-784-1321",w:"상시",lat:33.4638573,lng:126.9097475,pid:"ChIJBUeYSX0UDTURdFTO2dCHVkM"},
+{n:"SK행복충전 동천가스",addr:"서귀포시 일주동로 9052",p:"064-739-3488",w:"상시",lat:33.2474319,lng:126.525788,pid:"ChIJL4g0y9lTDDURvgDvNhVq1xg"},
+{n:"SK충전소 함덕LPG",addr:"제주시 조천읍 신북로 439",p:"064-784-1600",w:"05:30–23:00",lat:33.5367059,lng:126.6608245,pid:"ChIJWU-s3ygcDTURyyysQbWgwuU"},
+{n:"안전LPG충전소",addr:"제주시 건입동 12-3",p:"064-702-2121",w:"04:00–24:00",lat:33.5068466,lng:126.5560849,pid:"ChIJhf7Q3C_jDDURbg-Xhi3Fskc"},
+{n:"개인택시조합 화북점",addr:"제주시 선반남1길 66",p:"064-755-5151",w:"상시",lat:33.5137904,lng:126.5666115,pid:"ChIJ5-228N_iDDURQmkN6BPhOR8"},
+{n:"한마음가스충전소",addr:"제주시 이도2동 98-4",p:"064-722-7900",w:"상시",lat:33.489321,lng:126.551614,pid:"ChIJu2qBlsX8DDURXZ9etm0kiBg"},
+{n:"정우오라LPG충전소",addr:"제주시 오남로 150",p:"064-749-1123",w:"상시",lat:33.4825154,lng:126.5155337,pid:"ChIJkX4mI3v7DDURcWHLrquw4Ak"},
+{n:"개인택시조합 도두점",addr:"제주시 도공로 141",p:"064-713-2790",w:"–24:00",lat:33.4958465,lng:126.4684544,pid:"ChIJhRLLnvD6DDURzQf-mvsFkRo"},
+{n:"제주공항LPG충전소",addr:"제주시 일주서로 7709",p:"064-712-0020",w:"상시",lat:33.4942673,lng:126.4702807,pid:"ChIJ2-A1iuX7DDURJ_mFeFJ7sCo"},
+{n:"SK충전소 제주오케이",addr:"제주시 이호2동 1580",p:"064-749-5188",w:"상시",lat:33.4951519,lng:126.4573444,pid:"ChIJ1zYMxYr6DDURz6CxCw-QGP4"},
+{n:"천마한림충전소",addr:"제주시 한림읍 일주서로 5467",p:"064-796-7901",w:"상시",lat:33.4154909,lng:126.2758737},
+{n:"SK행복충전 송악충전소",addr:"서귀포시 대정읍 일주서로 2184",p:"064-792-7890",w:"상시",lat:33.2503745,lng:126.2844399,pid:"ChIJ2TSbqZJCDDURQnLvujSfhSc"},
+{n:"모슬포LPG충전소",addr:"서귀포시 대정읍 상모리 3711-1",p:"064-792-7788",w:"상시",lat:33.2278189,lng:126.2572023,pid:"ChIJby1TKedpDDURfpMNLZF6nps"}
+];
+var LPG=LPGRAW.map(function(s,i){
+  s.id="g"+i; s.cat="lpg"; s.stay=10;
+  s.d = s.key ? "숙소에서 가장 가까운 충전소. 번영로에 있어 공항 오갈 때 그대로 지나갑니다."
+              : "LPG는 안전밸브 때문에 80%까지만 들어갑니다. 반납 게이지만 맞추면 되니 나눠 넣으세요.";
+  return s;
+});
+
+/* ═══════════ 거리 · 시간 ═══════════ */
+function straight(a,b){var t=function(x){return x*Math.PI/180};
+ var dLa=t(b.lat-a.lat),dLo=t(b.lng-a.lng);
+ return 2*6371*Math.asin(Math.sqrt(Math.pow(Math.sin(dLa/2),2)+Math.cos(t(a.lat))*Math.cos(t(b.lat))*Math.pow(Math.sin(dLo/2),2)));}
+function roadKm(a,b){return straight(a,b)*1.3}
+function mins(a,b){var k=roadKm(a,b);var v=k<10?36:(k<30?45:52);return Math.max(4,Math.round(k/v*60));}
+function fkm(v){return (v<10?v.toFixed(1):Math.round(v))+"km"}
+function fhm(m){return m>=60?(Math.floor(m/60)+"시간 "+(m%60?m%60+"분":"")).trim():m+"분"}
+
+/* ═══════════ 구글맵 (주소 기준) ═══════════ */
+function target(o){ return o.addr ? o.addr+" "+o.n : o.n; }
+function gPlace(o){
+  var u="https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(target(o));
+  if(o.pid) u+="&query_place_id="+o.pid;
+  return u;
+}
+function gDir(a,b){
+  var u="https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(target(a))
+    +"&destination="+encodeURIComponent(target(b))+"&travelmode=driving";
+  if(a.pid) u+="&origin_place_id="+a.pid;
+  if(b.pid) u+="&destination_place_id="+b.pid;
+  return u;
+}
+function gRoute(list){
+  var pts=[BASE].concat(list,[BASE]);
+  var o=pts[0], d=pts[pts.length-1], mid=pts.slice(1,-1);
+  var u="https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(target(o))
+    +"&destination="+encodeURIComponent(target(d))+"&travelmode=driving";
+  if(mid.length){
+    u+="&waypoints="+mid.map(function(p){return encodeURIComponent(target(p))}).join("%7C");
+    if(mid.every(function(p){return !!p.pid}))
+      u+="&waypoint_place_ids="+mid.map(function(p){return p.pid}).join("%7C");
+  }
+  return u;
+}
+
+/* ═══════════ 상태 · 저장 ═══════════ */
+var CAT={sight:{label:"명소",color:"#5CC9C1"},cafe:{label:"카페",color:"#F0928D"},
+ food:{label:"맛집",color:"#8FB8F0"},car:{label:"렌터카",color:"#B79BE0"},lpg:{label:"LPG",color:"#FFC24D"}};
+var DAYC=["#5CC9C1","#8FB8F0","#F0928D"];
+var VIEWS={east:[455,55,405,400],south:[250,200,420,290],all:[0,0,860,490]};
+var KEY="jeju-trip-v4";
+
+var mem={};
+function load(){
+  try{ var raw=localStorage.getItem(KEY); if(raw) return JSON.parse(raw); }
+  catch(e){ if(mem[KEY]) return mem[KEY]; }
+  return null;
+}
+function save(){
+  var v={course:S.course,custom:S.custom,edits:S.edits,removed:S.removed};
+  try{ localStorage.setItem(KEY,JSON.stringify(v)); }catch(e){ mem[KEY]=v; }
+}
+
+var S={view:"all",day:0,sel:null,form:null,
+ filt:{sight:1,cafe:1,food:1,car:1,lpg:1},
+ course:[[],[],[]],custom:[],edits:{},removed:[]};
+var saved=load();
+if(saved){ S.course=saved.course||[[],[],[]]; S.custom=saved.custom||[];
+ S.edits=saved.edits||{}; S.removed=saved.removed||[]; }
+
+function allPlaces(){
+  var base=SEED.concat(S.custom).map(function(p){
+    return S.edits[p.id] ? Object.assign({},p,S.edits[p.id]) : p;
+  });
+  return base.concat(LPG).filter(function(p){ return S.removed.indexOf(p.id)<0; });
+}
+function byId(id){ var a=allPlaces(); for(var i=0;i<a.length;i++) if(a[i].id===id) return a[i]; return null; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+
+/* ═══════════ 지도 ═══════════ */
+function renderMap(){
+  var vb=VIEWS[S.view], R=Math.max(7,vb[2]/48), HIT=R*2.6;
+  var list=allPlaces().filter(function(p){return S.filt[p.cat]});
+  var cur=S.course[S.day];
+  var g='';
+
+  g+='<rect x="'+vb[0]+'" y="'+vb[1]+'" width="'+vb[2]+'" height="'+vb[3]+'" fill="url(#sg)"/>';
+  g+='<path d="'+COASTPATH+'" fill="url(#lg)" stroke="#3E8F86" stroke-width="'+(vb[2]/500)+'" stroke-linejoin="round"/>';
+  g+='<ellipse cx="'+px(126.952)+'" cy="'+py(33.505)+'" rx="9" ry="6" fill="url(#lg)" stroke="#3E8F86" stroke-width="'+(vb[2]/700)+'"/>';
+  [46,34,23,13].forEach(function(r,i){
+    g+='<circle cx="'+px(126.533)+'" cy="'+py(33.361)+'" r="'+r+'" fill="none" stroke="rgba(62,143,134,.3)" stroke-width="'+(i===3?vb[2]/600:vb[2]/900)+'"/>';
+  });
+
+  S.course.forEach(function(ids,di){
+    if(!ids.length) return;
+    var pts=[BASE].concat(ids.map(byId).filter(Boolean),[BASE]);
+    g+='<polyline points="'+pts.map(function(p){return px(p.lng)+","+py(p.lat)}).join(" ")+'" fill="none" stroke="'
+      +DAYC[di]+'" stroke-width="'+(vb[2]/230)+'" stroke-opacity="'+(di===S.day?.95:.3)
+      +'" stroke-dasharray="'+(vb[2]/120)+' '+(vb[2]/160)+'" stroke-linecap="round"/>';
+  });
+
+  list.forEach(function(p){
+    var idx=cur.indexOf(p.id), isSel=S.sel===p.id;
+    var c=idx>=0?DAYC[S.day]:CAT[p.cat].color;
+    var X=px(p.lng), Y=py(p.lat);
+    g+='<g class="pin" data-id="'+p.id+'" style="cursor:pointer">';
+    g+='<circle cx="'+X+'" cy="'+Y+'" r="'+HIT+'" fill="transparent"/>';
+    if(p.cat==="lpg"){
+      g+='<rect x="'+(X-R*.8)+'" y="'+(Y-R*.8)+'" width="'+(R*1.6)+'" height="'+(R*1.6)+'" transform="rotate(45 '+X+' '+Y+')" fill="#FFC24D" stroke="'+(isSel?"#fff":"#8A6410")+'" stroke-width="'+(isSel?R*.3:R*.12)+'"/>';
+    } else if(p.cat==="car"){
+      g+='<rect x="'+(X-R*.95)+'" y="'+(Y-R*.75)+'" width="'+(R*1.9)+'" height="'+(R*1.5)+'" rx="'+(R*.3)+'" fill="#B79BE0" stroke="'+(isSel?"#fff":"rgba(13,31,38,.45)")+'" stroke-width="'+(isSel?R*.28:R*.1)+'"/>';
+    } else {
+      g+='<circle cx="'+X+'" cy="'+Y+'" r="'+(isSel?R*1.3:R)+'" fill="'+c+'" stroke="'+(isSel?"#fff":"rgba(13,31,38,.45)")+'" stroke-width="'+(isSel?R*.28:R*.1)+'"/>';
+      if(idx>=0) g+='<text x="'+X+'" y="'+(Y+R*.38)+'" font-size="'+(R*1.1)+'" text-anchor="middle" fill="#0D1F26" style="pointer-events:none;font-weight:600" class="mono">'+(idx+1)+'</text>';
+    }
+    if(isSel) g+='<text x="'+X+'" y="'+(Y-R*1.9)+'" font-size="'+(R*1.5)+'" text-anchor="middle" fill="#fff" style="pointer-events:none">'+esc(p.n)+'</text>';
+    g+='</g>';
+  });
+
+  var BX=px(BASE.lng), BY=py(BASE.lat);
+  g+='<g class="pin" data-id="base" style="cursor:pointer">'
+    +'<circle cx="'+BX+'" cy="'+BY+'" r="'+HIT+'" fill="transparent"/>'
+    +'<circle cx="'+BX+'" cy="'+BY+'" r="'+(R*1.8)+'" fill="none" stroke="#fff" stroke-width="'+(R*.1)+'" stroke-opacity=".55"/>'
+    +'<circle cx="'+BX+'" cy="'+BY+'" r="'+(R*.9)+'" fill="#fff" stroke="#0D1F26" stroke-width="'+(R*.18)+'"/>'
+    +'<text x="'+BX+'" y="'+(BY-R*2.6)+'" font-size="'+(R*1.5)+'" text-anchor="middle" fill="#fff" style="pointer-events:none">숙소</text></g>';
+
+  return '<div class="mapwrap"><svg viewBox="'+vb.join(" ")+'" preserveAspectRatio="xMidYMid meet">'
+    +'<defs><radialGradient id="sg" cx="50%" cy="45%" r="75%"><stop offset="0%" stop-color="#16333D"/><stop offset="100%" stop-color="#0B1A20"/></radialGradient>'
+    +'<linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EFEBDD"/><stop offset="100%" stop-color="#DBD5C3"/></linearGradient></defs>'
+    +g+'</svg><div class="zoom">'
+    +[["all","전체"],["east","동부"],["south","남부"]].map(function(v){
+      return '<button data-view="'+v[0]+'" aria-pressed="'+(S.view===v[0])+'">'+v[1]+'</button>'}).join("")
+    +'</div></div>';
+}
+
+/* ═══════════ 폼 ═══════════ */
+function renderForm(){
+  var f=S.form;
+  var h='<div class="card form"><h2>'+(f.id?"장소 수정":"장소 추가")+'</h2>';
+  h+='<label class="mono">이름</label><input id="fn" value="'+esc(f.n)+'" placeholder="예: 제주OK렌트카 본점">';
+  h+='<label class="mono">분류</label><div class="cats">';
+  Object.keys(CAT).forEach(function(k){
+    if(k==="lpg"&&f.cat!=="lpg") return;
+    h+='<button class="cat" data-cat="'+k+'" aria-pressed="'+(f.cat===k)+'" style="'+(f.cat===k?"background:"+CAT[k].color:"")+'">'+CAT[k].label+'</button>';
+  });
+  h+='</div>';
+  h+='<label class="mono">주소</label><input id="fa" value="'+esc(f.addr||"")+'" placeholder="예: 제주시 용문로 64">';
+  h+='<div class="note">주소에 읍·면·동이나 도로명이 있으면 그 지역에 표시됩니다. 정확히 찍으려면 구글맵에서 해당 지점을 길게 눌러 나오는 위도·경도를 아래에 넣으세요.</div>';
+  h+='<label class="mono">위도 · 경도 (선택)</label><div class="two">'
+    +'<input id="flat" value="'+esc(f.lat||"")+'" placeholder="33.504" inputmode="decimal">'
+    +'<input id="flng" value="'+esc(f.lng||"")+'" placeholder="126.503" inputmode="decimal"></div>';
+  h+='<label class="mono">머무는 시간 (분)</label><input id="fs" value="'+esc(f.stay||45)+'" inputmode="numeric">';
+  h+='<label class="mono">전화 (선택)</label><input id="fp" value="'+esc(f.p||"")+'" placeholder="064-000-0000" inputmode="tel">';
+  h+='<label class="mono">메모</label><textarea id="fd" placeholder="무엇을 먹을지, 왜 가는지">'+esc(f.d||"")+'</textarea>';
+  h+='<label class="mono">영업시간 · 휴무</label><input id="fw" value="'+esc(f.w||"")+'" placeholder="예: 수요일 휴무 · 21:00 마감">';
+  h+='<div class="acts"><button class="b pri" data-act="save">저장</button>'
+    +'<button class="b" data-act="cancel">취소</button>';
+  if(f.addr) h+='<a class="b" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(f.addr)+'">주소 확인</a>';
+  h+='</div></div>';
+  return h;
+}
+
+/* ═══════════ 상세 카드 ═══════════ */
+function renderCard(){
+  var o = S.sel==="base" ? BASE : byId(S.sel);
+  if(!o) return "";
+  var cur=S.course[S.day], added=cur.indexOf(o.id)>=0;
+  var isSeed = SEED.some(function(s){return s.id===o.id});
+  var h='<div class="card"><h2>'+esc(o.n);
+  if(o.r) h+='<span class="tagr mono">★ '+Number(o.r).toFixed(1)+'</span>';
+  if(o.approx) h+='<span class="tagu mono">위치 대략</span>';
+  h+='</h2>';
+  h+='<div class="sub mono">'+(o.id==="base"?esc(o.addr)
+    : CAT[o.cat].label+(o.addr?" · "+esc(o.addr):"")+(o.cat!=="lpg"?" · 체류 "+o.stay+"분":"")
+      +" · 숙소에서 약 "+fhm(mins(BASE,o)))+'</div>';
+  if(o.d) h+='<p class="desc">'+esc(o.d)+'</p>';
+  if(o.id==="base") h+='<p class="desc">표선면 하천리. 번영로가 바로 옆이라 제주시·공항 접근이 좋습니다.</p>';
+  if(o.w) h+='<div class="warn mono">'+esc(o.w)+'</div>';
+  if(o.approx) h+='<div class="warn mono">'+esc(o.area)+' 부근에 찍힌 대략 위치입니다. 수정에서 좌표를 넣으면 정확해집니다.</div>';
+  h+='<div class="acts">';
+  if(o.id!=="base"&&o.cat!=="lpg")
+    h+= added ? '<button class="b danger" data-act="del" data-id="'+o.id+'">DAY '+(S.day+1)+'에서 빼기</button>'
+              : '<button class="b pri" data-act="add" data-id="'+o.id+'">DAY '+(S.day+1)+'에 추가</button>';
+  h+='<a class="b" target="_blank" rel="noopener" href="'+gPlace(o)+'">구글맵</a>';
+  if(o.id!=="base") h+='<a class="b" target="_blank" rel="noopener" href="'+gDir(BASE,o)+'">길찾기 (소요시간)</a>';
+  if(o.p) h+='<a class="b" href="tel:'+o.p.replace(/-/g,"")+'">전화</a>';
+  if(o.id!=="base") h+='<button class="b" data-act="edit" data-id="'+o.id+'">수정</button>';
+  if(o.id!=="base") h+='<button class="b danger" data-act="remove" data-id="'+o.id+'">'+(isSeed?"목록에서 삭제":"삭제")+'</button>';
+  h+='</div></div>';
+  return h;
+}
+
+/* ═══════════ 전체 렌더 ═══════════ */
+function render(){
+  var list=allPlaces(), cur=S.course[S.day];
+  var shown=list.filter(function(p){return S.filt[p.cat]});
+  var stops=cur.map(byId).filter(Boolean);
+  var pts=[BASE].concat(stops);
+  var legs=pts.slice(1).map(function(p,i){return {m:mins(pts[i],p),k:roadKm(pts[i],p)}});
+  var back=stops.length?{m:mins(stops[stops.length-1],BASE),k:roadKm(stops[stops.length-1],BASE)}:null;
+  var drive=legs.reduce(function(a,l){return a+l.m},0)+(back?back.m:0);
+  var stay=stops.reduce(function(a,p){return a+(parseInt(p.stay,10)||30)},0);
+
+  var h='';
+  h+='<div class="top"><div><h1>제주 코스 · 표선 베이스</h1>'
+    +'<p class="mono">장소 '+list.filter(function(p){return p.cat!=="lpg"}).length+' · LPG '+LPG.filter(function(p){return S.removed.indexOf(p.id)<0}).length+' · 소요시간 추정</p></div>'
+    +'<button class="addbtn" data-act="new">+ 장소 추가</button></div>';
+
+  h+=renderMap();
+
+  h+='<div class="chips">';
+  Object.keys(CAT).forEach(function(k){
+    h+='<button class="chip" data-filt="'+k+'" aria-pressed="'+(!!S.filt[k])+'" style="'+(S.filt[k]?"background:"+CAT[k].color:"")+'">'
+      +CAT[k].label+' '+list.filter(function(p){return p.cat===k}).length+'</button>';
+  });
+  h+='</div>';
+
+  h+='<div class="days">';
+  [0,1,2].forEach(function(i){
+    h+='<button class="day" data-day="'+i+'" aria-pressed="'+(S.day===i)+'" style="'+(S.day===i?"background:"+DAYC[i]:"")+'">DAY '+(i+1)
+      +(S.course[i].length?' · '+S.course[i].length:'')+'</button>';
+  });
+  h+='</div><div class="body">';
+
+  if(S.form) h+=renderForm();
+  else if(S.sel) h+=renderCard();
+  else h+='<p class="empty">지도의 점이나 아래 목록을 눌러 장소를 고르고,<br>「DAY '+(S.day+1)+'에 추가」를 누르면 경로가 이어집니다.</p>';
+
+  h+='<div class="h mono">DAY '+(S.day+1)+' 코스</div>';
+  if(!stops.length) h+='<p class="empty">아직 비어 있습니다.</p>';
+  else{
+    h+='<div class="leg mono">숙소 출발</div>';
+    stops.forEach(function(p,i){
+      h+='<div class="leg mono">▼ 약 '+fhm(legs[i].m)+' · '+fkm(legs[i].k)+'</div>';
+      h+='<div class="row" style="cursor:default"><span class="dot" style="background:'+DAYC[S.day]+'">'+(i+1)+'</span>'
+        +'<span style="flex:1;min-width:0;cursor:pointer" data-act="sel" data-id="'+p.id+'">'
+        +'<span class="n">'+esc(p.n)+'</span><span class="m mono">'+(p.r?"★"+p.r+" · ":"")+CAT[p.cat].label+' · '+p.stay+'분</span></span>'
+        +'<span style="display:flex;gap:4px">'
+        +'<button class="ord" data-act="up" data-i="'+i+'">↑</button>'
+        +'<button class="ord" data-act="down" data-i="'+i+'">↓</button>'
+        +'<button class="ord" data-act="del" data-id="'+p.id+'">×</button></span></div>';
+    });
+    h+='<div class="leg mono">▼ 약 '+fhm(back.m)+' · '+fkm(back.k)+'</div><div class="leg mono">숙소 도착</div>';
+    h+='<div class="sum"><b>이동 '+fhm(drive)+' + 체류 '+fhm(stay)+'</b>'
+      +'<span>합계 약 '+fhm(drive+stay)+' · 총 '+fkm(legs.reduce(function(a,l){return a+l.k},0)+back.k)+'</span></div>';
+    h+='<div class="acts"><a class="b pri" target="_blank" rel="noopener" href="'+gRoute(stops)+'">구글맵에서 전체 경로 열기</a>'
+      +'<button class="b" data-act="clear">비우기</button></div>';
+  }
+
+  h+='<div class="h mono">후보 · 숙소에서 가까운 순</div>';
+  shown.filter(function(p){return p.cat!=="lpg"})
+    .map(function(p){return {p:p,m:mins(BASE,p)}})
+    .sort(function(a,b){return a.m-b.m})
+    .forEach(function(x){
+      var i=cur.indexOf(x.p.id);
+      h+='<button class="row" data-act="sel" data-id="'+x.p.id+'">'
+        +'<span class="dot'+(x.p.cat==="car"||x.p.cat==="lpg"?" sq":"")+'" style="background:'+CAT[x.p.cat].color+'">'+(i>=0?i+1:"")+'</span>'
+        +'<span style="flex:1;min-width:0"><span class="n">'+esc(x.p.n)+(x.p.user?" ✎":"")+'</span>'
+        +'<span class="m mono">'+(x.p.r?"★"+x.p.r+" · ":"")+CAT[x.p.cat].label+(x.p.approx?" · 위치 대략":"")+'</span></span>'
+        +'<span class="rt mono">차로<br>'+fhm(x.m)+'</span></button>';
+    });
+
+  if(S.filt.lpg){
+    h+='<div class="h mono">LPG 충전소 · 숙소에서 가까운 순</div>';
+    shown.filter(function(p){return p.cat==="lpg"})
+      .map(function(p){return {p:p,m:mins(BASE,p)}})
+      .sort(function(a,b){return a.m-b.m})
+      .forEach(function(x){
+        h+='<button class="row" data-act="sel" data-id="'+x.p.id+'">'
+          +'<span class="dot sq" style="background:#FFC24D">'+(x.p.key?"★":"")+'</span>'
+          +'<span style="flex:1;min-width:0"><span class="n">'+esc(x.p.n)+'</span>'
+          +'<span class="m mono">'+esc(x.p.addr)+' · '+esc(x.p.w)+'</span></span>'
+          +'<span class="rt mono">차로<br>'+fhm(x.m)+'</span></button>';
+      });
+  }
+
+  if(S.removed.length)
+    h+='<div class="acts" style="margin-top:16px"><button class="b" data-act="restore">삭제한 장소 '+S.removed.length+'곳 되돌리기</button></div>';
+
+  h+='<div class="foot">코스와 직접 추가한 장소는 이 브라우저에 저장됩니다. 소요시간은 직선거리에 제주 도로 '
+    +'우회계수와 구간별 속도를 적용한 추정값이고, 「길찾기」와 「전체 경로 열기」를 누르면 구글맵이 실제 '
+    +'소요시간을 계산해 보여줍니다. 장소는 주소로 검색되며 구글 Place ID가 있으면 상호로 바로 열립니다.</div>';
+  h+='</div>';
+
+  document.getElementById("app").innerHTML=h;
+}
+
+/* ═══════════ 이벤트 ═══════════ */
+function saveForm(){
+  var f=S.form;
+  var n=document.getElementById("fn").value.trim();
+  if(!n){ alert("이름을 입력해 주세요."); return; }
+  var addr=document.getElementById("fa").value.trim();
+  var lat=parseFloat(document.getElementById("flat").value);
+  var lng=parseFloat(document.getElementById("flng").value);
+  var approx=false, area=null;
+  if(!(lat>=33&&lat<=34&&lng>=126&&lng<=127.2)){
+    var g=geocode(addr);
+    if(!g){ alert("주소에서 제주 지역명을 찾지 못했습니다.\n읍·면·동이나 도로명이 들어간 주소를 넣거나, 위도·경도를 직접 입력해 주세요."); return; }
+    lat=g.lat; lng=g.lng; approx=true; area=g.area;
+  }
+  var rec={id:f.id||("u"+Date.now()),n:n,cat:f.cat,addr:addr,lat:lat,lng:lng,
+    stay:parseInt(document.getElementById("fs").value,10)||45,
+    p:document.getElementById("fp").value.trim(),
+    d:document.getElementById("fd").value.trim(),
+    w:document.getElementById("fw").value.trim(),
+    approx:approx,area:area,user:!f.seed,pid:f.pid,r:f.r};
+  if(f.seed) S.edits[f.id]=rec;
+  else if(f.id) S.custom=S.custom.map(function(x){return x.id===f.id?rec:x});
+  else S.custom.push(rec);
+  S.sel=rec.id; S.form=null; save(); render();
+}
+
+document.addEventListener("click",function(e){
+  var t=e.target.closest("[data-view],[data-filt],[data-day],[data-cat],[data-act],.pin");
+  if(!t) return;
+
+  if(t.dataset.view){ S.view=t.dataset.view; render(); return; }
+  if(t.dataset.filt){ S.filt[t.dataset.filt]=!S.filt[t.dataset.filt]; render(); return; }
+  if(t.dataset.day!==undefined && t.classList.contains("day")){ S.day=+t.dataset.day; render(); return; }
+  if(t.dataset.cat && S.form){ S.form.cat=t.dataset.cat; captureForm(); render(); return; }
+  if(t.classList.contains("pin")){ S.sel=t.dataset.id; S.form=null; render(); window.scrollTo({top:document.querySelector(".chips").offsetTop-10,behavior:"smooth"}); return; }
+
+  var a=t.dataset.act, id=t.dataset.id;
+  if(a==="sel"){ S.sel=id; S.form=null; render(); return; }
+  if(a==="new"){ S.form={n:"",cat:"food",addr:"",stay:45,d:"",w:"",p:"",lat:"",lng:""}; S.sel=null; render(); return; }
+  if(a==="cancel"){ S.form=null; render(); return; }
+  if(a==="save"){ saveForm(); return; }
+  if(a==="edit"){ var o=byId(id);
+    S.form={id:o.id,n:o.n,cat:o.cat,addr:o.addr||"",lat:o.lat,lng:o.lng,stay:o.stay,p:o.p||"",
+      d:o.d||"",w:o.w||"",pid:o.pid,r:o.r,seed:SEED.some(function(s){return s.id===o.id})};
+    render(); return; }
+  if(a==="add"){ if(S.course[S.day].indexOf(id)<0) S.course[S.day].push(id); save(); render(); return; }
+  if(a==="del"){ S.course[S.day]=S.course[S.day].filter(function(x){return x!==id}); save(); render(); return; }
+  if(a==="remove"){
+    var p=byId(id);
+    if(!confirm('"'+p.n+'" 을(를) 목록에서 삭제할까요?')) return;
+    S.removed.push(id);
+    S.course=S.course.map(function(d){return d.filter(function(x){return x!==id})});
+    S.custom=S.custom.filter(function(x){return x.id!==id});
+    S.sel=null; save(); render(); return; }
+  if(a==="restore"){ S.removed=[]; save(); render(); return; }
+  if(a==="up"||a==="down"){
+    var i=+t.dataset.i, j=i+(a==="up"?-1:1), d=S.course[S.day];
+    if(j>=0&&j<d.length){ var tmp=d[i]; d[i]=d[j]; d[j]=tmp; save(); render(); }
+    return; }
+  if(a==="clear"){ S.course[S.day]=[]; save(); render(); return; }
+});
+
+function captureForm(){
+  ["n:fn","addr:fa","lat:flat","lng:flng","stay:fs","p:fp","d:fd","w:fw"].forEach(function(pair){
+    var kv=pair.split(":"), el=document.getElementById(kv[1]);
+    if(el) S.form[kv[0]]=el.value;
+  });
+}
+
+render();
+</script>
+</body>
+</html>
