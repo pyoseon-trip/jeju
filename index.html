@@ -91,6 +91,26 @@ a{color:inherit}
 .note{font-size:11px;line-height:1.7;color:rgba(13,31,38,.5);margin-top:7px;background:rgba(62,143,134,.09);
  padding:9px 10px;border-radius:3px}
 .two{display:flex;gap:6px}
+.ins{display:block;width:100%;border:1px dashed rgba(13,31,38,.22);background:transparent;
+ color:rgba(13,31,38,.42);font-size:11.5px;padding:8px;border-radius:3px;cursor:pointer;margin:4px 0}
+.ins:active{background:rgba(62,143,134,.1)}
+.insbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--teal);
+ color:#fff;border-radius:4px;padding:11px 13px;margin:10px 0;font-size:12.5px}
+.insbar .b{border-color:rgba(255,255,255,.4);color:#fff;padding:7px 11px}
+.mkt{margin-top:10px;background:rgba(169,190,110,.18);border-left:3px solid #A9BE6E;padding:9px 11px;border-radius:0 3px 3px 0}
+.mkt b{display:block;font-size:11.5px;font-weight:500;color:#4A5A22}
+.mkt span{display:block;font-size:12px;margin-top:4px;color:#3C4A1C}
+.mkt.no{background:rgba(176,74,58,.1);border-left-color:#B04A3A}
+.mkt.no b{color:#7A3A2E} .mkt.no span{color:#B04A3A;font-weight:500}
+.row.dim .n{opacity:.5}
+.onlybar{padding:9px 15px 0}
+.onlybar .chip{width:100%;padding:9px}
+.leg.start{color:var(--teal);font-weight:500;font-size:12px;padding-top:10px}
+.mapwrap svg{touch-action:none;cursor:grab}
+.mapwrap svg:active{cursor:grabbing}
+.maphint{position:absolute;left:10px;bottom:9px;font-size:9.5px;color:rgba(234,242,240,.45);
+ background:rgba(13,31,38,.45);padding:4px 8px;border-radius:3px;line-height:1;pointer-events:none}
+.zoom button{width:38px;height:34px;font-size:13px}
 </style>
 </head>
 <body>
@@ -143,8 +163,14 @@ function geocode(addr){
 }
 
 /* ═══════════ 숙소 ═══════════ */
-var BASE={id:"base",n:"숙소",cat:"base",lat:33.354,lng:126.818,
- addr:"제주특별자치도 서귀포시 표선면 한마음초등로 616-8"};
+var BASE={id:"base",n:"숙소 (표선면 하천리)",cat:"car",lat:33.354,lng:126.818,stay:0,
+ addr:"제주특별자치도 서귀포시 표선면 한마음초등로 616-8",
+ d:"DAY 2·3 출발지. 표선면 하천리로, 번영로가 바로 옆이라 제주시·공항 접근이 좋습니다. DAY 1 마지막에 넣으면 체크인 동선이 됩니다."};
+var AIRPORT={id:"air",n:"제주국제공항",cat:"car",lat:33.5070772,lng:126.4934311,
+ pid:"ChIJxb_FCjv7DDURZ8wL9kMz_-0",addr:"제주시 공항로 2",stay:0,
+ d:"DAY 1 출발지. 렌터카 업체 셔틀은 3번 게이트 앞에서 탑니다.",w:"1661-2626"};
+/* 일자별 출발지: DAY1 공항, DAY2·3 숙소 */
+function originOf(d){ return d===0 ? AIRPORT : BASE; }
 
 /* ═══════════ 기본 장소 (주소 기준) ═══════════ */
 var SEED=[
@@ -159,7 +185,7 @@ var SEED=[
 {id:"s7",n:"아부오름",r:4.5,cat:"sight",addr:"제주시 구좌읍 송당리 산164-1",lat:33.447607,lng:126.7772601,pid:"ChIJPw-uGpwaDTURAXs4ANhXLSc",stay:50,d:"계단 2분이면 능선. 분화구 안 삼나무가 원형으로 심겨 있습니다.",w:"주차장 넓음"},
 {id:"s8",n:"정방폭포",r:4.5,cat:"sight",addr:"서귀포시 칠십리로214번길 37",lat:33.2448567,lng:126.5715794,pid:"ChIJ8afI-XNTDDURC7OZzyBO8KA",stay:50,d:"바다로 직접 떨어지는 폭포. 해녀 좌판은 현금만.",w:"09:00–17:20"},
 {id:"s9",n:"세화해변",r:4.5,cat:"sight",addr:"제주시 구좌읍 해녀박물관길 26",lat:33.5249646,lng:126.8598017,pid:"ChIJT0n_YzoXDTURcrZLa9grm4Y",stay:40,d:"검은 현무암과 흰 모래, 물빛 대비가 제주 최고 수준.",w:"간조 때 모래톱"},
-{id:"s10",n:"행원해변 (코난비치)",r:4.5,cat:"sight",addr:"제주시 구좌읍 행원리 575-6",lat:33.5575318,lng:126.8112241,pid:"ChIJkeFHN5wXDTUREQkuDYsoO3o",stay:35,d:"풍력발전기와 바다가 겹치는 비공식 해변.",w:"편의시설 없음"},
+{id:"s10",n:"행원해변 (코난해변)",r:4.5,cat:"sight",addr:"제주시 구좌읍 행원리 575-6",lat:33.5575318,lng:126.8112241,pid:"ChIJkeFHN5wXDTUREQkuDYsoO3o",stay:35,d:"예능 촬영으로 알려진 비공식 해변. 풍력발전기와 검은 현무암, 물빛이 겹칩니다. 매점·탈의실이 없으니 물놀이보다 사진 찍고 걷기 좋습니다.",w:"편의시설 없음 · 주차 협소"},
 {id:"s11",n:"함덕해수욕장",r:4.5,cat:"sight",addr:"제주시 조천읍 함덕리 1004",lat:33.5434231,lng:126.6697752,pid:"ChIJVSv3qq_8DDURcLh4pWxZ0vA",stay:60,d:"에메랄드 물빛에 시설이 잘 갖춰진 대형 해변.",w:"성수기 주차 혼잡"},
 {id:"s12",n:"우도",r:4.5,cat:"sight",addr:"제주시 우도면",lat:33.5042977,lng:126.954048,pid:"ChIJA_du00wVDTURisfAXXmN2fQ",stay:240,d:"성산항에서 배 15분. 반나절은 잡아야 합니다.",w:"배편 시간 확인"},
 
@@ -177,28 +203,18 @@ var SEED=[
 {id:"c12",n:"카페 와랑와랑",r:4.5,cat:"cafe",addr:"서귀포시 남원읍 위미중앙로300번길 28",lat:33.2723619,lng:126.676564,pid:"ChIJTaVpgzeqDTURtmuzwN4E3nM",stay:50,p:"070-4656-1761",d:"위미 시골 마을. 드립커피와 구운 떡.",w:"수요일 휴무"},
 {id:"c13",n:"Today's Sea",r:4.5,cat:"cafe",addr:"서귀포시 이어도로 990",lat:33.2416342,lng:126.5186935,pid:"ChIJj4w4CTxRDDURU3Efd_05Vis",stay:40,d:"서귀포 해안도로 루프덱. 오트밀크 있음.",w:"08:00–22:00"},
 
-{id:"f1",n:"태평식당",r:5.0,cat:"food",addr:"서귀포시 서귀동 146-3",lat:33.2465444,lng:126.5680343,pid:"ChIJQ6n4GQBTDDURBNJRCtCSl4c",stay:70,p:"064-904-1119",d:"서귀포 갈비찜·감자탕. 국물 요리가 필요할 때.",w:"일요일 휴무"},
 {id:"f2",n:"서귀집",r:5.0,cat:"food",addr:"서귀포시 칠십리로 306",lat:33.2474755,lng:126.5852532,pid:"ChIJG3SAuEBTDDURExQ2tIDBu_c",stay:80,p:"064-904-1585",d:"서귀포 흑돼지. 사장님이 주방에서 초벌해 내옵니다.",w:"15:00–24:00 · 저녁만"},
-{id:"f3",n:"훈도 제주 흑돼지",r:4.9,cat:"food",addr:"제주시 애월읍 애월리 37",lat:33.4622121,lng:126.3123446,pid:"ChIJp612ESb1DDUREWRu339q3ak",stay:80,p:"010-4151-1888",d:"애월 바다 앞 흑돼지. 직원이 구워줍니다.",w:"11:00–23:00"},
-{id:"f4",n:"궤네깃도 중문흑돼지",r:4.9,cat:"food",addr:"서귀포시 일주서로 966",lat:33.2583323,lng:126.40761,pid:"ChIJDaUylAhbDDURB2B5cYs5NhY",stay:80,p:"010-6643-2157",d:"중문. 반찬으로 간장게장이 나오고 아이 놀이터가 있습니다.",w:"11:00–23:00"},
 {id:"f5",n:"소길국수",r:4.9,cat:"food",addr:"제주시 신대로 72",lat:33.4909478,lng:126.4964562,pid:"ChIJm0S2FgD7DDURp-crQGXGwyc",stay:45,d:"제주시 고기국수. 공항 가기 전 마지막 끼니로 좋습니다.",w:"08:00–16:00"},
-{id:"f6",n:"돌담흑돼지 (연동)",r:4.8,cat:"food",addr:"제주시 연동7길 35 2층",lat:33.486769,lng:126.4908622,pid:"ChIJvYqSg-v7DDURJ8kfsIcwjKE",stay:80,p:"064-742-6090",d:"제주시 연동. 반찬 셀프바가 있고 새벽 2시까지.",w:"11:00–02:00"},
-{id:"f7",n:"하여금 흑돼지",r:4.8,cat:"food",addr:"제주시 원노형4길 11",lat:33.4850855,lng:126.4824952,pid:"ChIJp9mW82T7DDUR9X5WiZYEwaI",stay:80,d:"노형동. 두껍게 썬 목살과 가브리살.",w:"12:00–24:00"},
-{id:"f8",n:"중문그때그집 숙성",r:4.8,cat:"food",addr:"서귀포시 상계로 181-28",lat:33.2641894,lng:126.3901466,pid:"ChIJF-cXnJBbDDURMQTaDfkuX74",stay:80,p:"064-784-9244",d:"중문 숙성 흑돼지. 반찬 무한 리필.",w:"09:50–23:00"},
-{id:"f9",n:"함덕고등어쌈밥",r:4.8,cat:"food",addr:"제주시 조천읍 조함해안로 530",lat:33.5425125,lng:126.6696539,pid:"ChIJR8EWwXofDTURsWTmdup3GV8",stay:60,p:"070-8211-2736",d:"함덕해변 3층. 전복미역국이 특히 좋습니다.",w:"09:00–21:30"},
-{id:"f10",n:"물고기자리",r:4.8,cat:"food",addr:"서귀포시 성산읍 성산리 145-6",lat:33.4611885,lng:126.9333042,pid:"ChIJ3x4P4hgVDTURcnYy5tRqpTQ",stay:90,p:"064-900-9642",d:"성산. 회·구이·튀김·전복탕 코스가 1인 3만원대.",w:"월요일 휴무 · 예약 권장"},
-{id:"f11",n:"갈치관 애월해안도로점",r:4.7,cat:"food",addr:"제주시 애월읍 애월해안로 686",lat:33.4819725,lng:126.3752439,pid:"ChIJFTrfWdH3DDURiSp0smqRamY",stay:70,d:"애월 해안도로. 갈치구이와 전복죽.",w:"10:00–21:00"},
-{id:"f12",n:"바당포구",r:4.7,cat:"food",addr:"서귀포시 대정읍 하모항구로 62-1",lat:33.2190004,lng:126.2511272,pid:"ChIJuZjfIVVpDDURX42ZYB8pzNg",stay:80,d:"모슬포항. 고등어회와 제주 벵에돔. 로컬만 아는 집.",w:"화요일 휴무"},
-{id:"f13",n:"동문시장고기국수",r:4.7,cat:"food",addr:"제주시 일도1동 1148-2",lat:33.5127431,lng:126.5283168,pid:"ChIJJysfZjjjDDURUocRtINoQHY",stay:40,p:"064-757-6055",d:"동문시장 12번 게이트. 돔베고기 얹은 고기국수 8,000원.",w:"08:00–18:00 · 주차 불편"},
-{id:"f14",n:"중문고등어쌈밥",r:4.7,cat:"food",addr:"서귀포시 일주서로 1240",lat:33.2648884,lng:126.3806793,pid:"ChIJXahjXqdbDDURvaV68VQyUoo",stay:60,p:"064-738-2457",d:"묵은지 고등어조림. 영어 태블릿 주문, 주차 넉넉.",w:"09:30–20:00"},
 {id:"f15",n:"광어다 표선 본점",r:4.6,cat:"food",addr:"서귀포시 표선면 세화리 181",lat:33.3039639,lng:126.8089208,pid:"ChIJlQ6V_pkJDTURQmhiZU5UtD0",stay:80,p:"064-787-8838",d:"표선. 광어 한 마리를 회·튀김·지리로.",w:"목요일 휴무 · 19:00 마감"},
-{id:"f16",n:"안녕, 전복",r:4.6,cat:"food",addr:"제주시 도두1동 1355",lat:33.4991362,lng:126.475806,pid:"ChIJ0fR4lrvlDDURAIqjHyl1lXU",stay:60,p:"010-9800-3282",d:"도두. 전복죽과 아보카도 비빔밥. 공항 활주로가 보입니다.",w:"목요일 휴무 · 대기 있음"},
-{id:"f17",n:"덜전복",r:4.6,cat:"food",addr:"제주시 도두항서길 53",lat:33.5052401,lng:126.4639129,pid:"ChIJL6zEAfH7DDUR3gpm6EAW_Zg",stay:60,d:"도두항. 전복 돌솥밥과 간장게장 반찬.",w:"10:00–21:00"},
-{id:"f18",n:"교래흑돼지 표선점",r:4.5,cat:"food",addr:"서귀포시 표선면 가시로 13",lat:33.3301299,lng:126.8208621,pid:"ChIJw-fnVBAPDTUREnZZ5L1OCTI",stay:70,p:"064-787-6338",d:"직원이 끝까지 구워줍니다. 멜젓 기본.",w:"수요일 휴무 · 예약 권장"},
-{id:"f19",n:"해왓",r:4.5,cat:"food",addr:"서귀포시 성산읍 신고로 30-1",lat:33.4384861,lng:126.9172371,pid:"ChIJMeKTq_UTDTURz39n1wgJhqQ",stay:60,p:"064-782-5689",d:"성산 갈치구이·성게미역국. 현지인 줄 서는 집.",w:"수요일 휴무"},
-{id:"f20",n:"미영이네",r:4.5,cat:"food",addr:"서귀포시 대정읍 하모리 770-29",lat:33.2177388,lng:126.2498932,pid:"ChIJAzVlLPdpDDURwtrd3yMUWnM",stay:70,p:"064-792-0077",d:"모슬포 고등어회 대표 격. 고등어구이도 꼭 시키세요.",w:"수요일 휴무"},
-{id:"f21",n:"제주광해 애월본점",r:4.5,cat:"food",addr:"제주시 애월읍 애월해안로 867",lat:33.4877605,lng:126.3904307,pid:"ChIJB0t1zSfxDDURnYEUbuKVTWs",stay:80,p:"064-713-4789",d:"애월 바다뷰 갈치정식. 대기 30분~1시간.",w:"10:00–20:00 · 라스트오더 19:00"},
-{id:"f22",n:"장인의집",r:4.5,cat:"food",addr:"제주시 애월읍 애월로19길 31",lat:33.4658022,lng:126.3268488,pid:"ChIJdwHdps71DDURi_FxVYc1ARU",stay:60,p:"064-799-1610",d:"애월. 해물뚝배기와 손만두. 자리가 적어 대기 있습니다.",w:"09:00–22:30"}
+{id:"f23",n:"숙성도 애월점",r:5.0,cat:"food",addr:"제주시 애월읍 애월로1길 24-16",lat:33.463515,lng:126.3096504,pid:"ChIJiw5yajf1DDURVARlrKYqgbM",stay:90,p:"064-799-4231",d:"숙성 흑돼지 전문. 직원이 뼈등심·목살을 끝까지 구워줍니다. 리뷰 900개에 평점 5.0. 김치볶음밥과 김치찌개도 평이 좋습니다.",w:"매일 11:30–22:00 · 대기 김"},
+{id:"f24",n:"우진해장국",r:4.1,cat:"food",addr:"제주시 서사로 11",lat:33.511505,lng:126.5200319,pid:"ChIJ1RG1J6vkDDURux7pPbxUvbY",stay:50,p:"064-757-3393",d:"고사리육개장으로 유명한 제주시 노포. 오전 6시부터 열어 이른 아침이나 공항 가기 전에 좋습니다. 국물이 걸쭉한 죽 형태라 호불호가 갈립니다.",w:"매일 06:00–22:00 · 대기 1시간 · 앞 공영주차장 외국카드 불가"},
+{id:"f25",n:"당케올레국수",r:4.3,cat:"food",addr:"서귀포시 표선면 표선당포로 4",lat:33.3253355,lng:126.8431227,pid:"ChIJUcAJpssODTURqw6qW6--2Tw",stay:50,p:"064-787-4551",d:"표선해수욕장 앞 국수집. 보말국수와 전복죽이 대표 메뉴. 숙소에서 가장 가까운 맛집입니다.",w:"목요일 휴무 · 08:00–17:00 · 현장 대기 있음"},
+
+{id:"m1",n:"표선민속오일시장",r:3.7,cat:"market",mdays:[2,7],addr:"서귀포시 표선면 표선동서로 203-1",lat:33.3225669,lng:126.8301192,pid:"ChIJ_URD-SsJDTURHH6sBAhxMac",stay:60,p:"064-760-4475",d:"숙소에서 차로 5분. 생선동·채소동·식당동 세 건물로 나뉜 작은 동네 장입니다. 관광객이 거의 없어 값이 착합니다. 갓 만든 두부 2,500원, 콩국 7,000원, 은갈치 한 바구니 2만원. 왼쪽 두부집은 오전 10시쯤 물건이 들어오고 줄이 섭니다. 숙소에서 해 먹을 식재료를 소량으로 사기엔 여기가 최적입니다.",w:"오후 3시면 대부분 철수"},
+{id:"m2",n:"함덕민속오일시장",r:3.5,cat:"market",mdays:[1,6],addr:"제주시 조천읍 함덕리 972-7",lat:33.540292,lng:126.668048,pid:"ChIJ32_ZLVUfDTURD736Sqg_rng",stay:45,d:"공항에서 표선으로 내려오는 길에 걸립니다. 규모는 아주 작지만 생선값이 제주에서 손꼽히게 싸다는 후기가 반복됩니다. 갈치를 저렴하게 집어오기 좋습니다. 함덕해수욕장 바로 옆이라 해변과 묶어 들르면 됩니다.",w:"낮 12시 마감 · 오전에 가야 함"},
+{id:"m3",n:"동문재래시장",r:4.1,cat:"market",addr:"제주시 관덕로14길 20",lat:33.5115133,lng:126.5262564,pid:"ChIJBdEw_1PjDDUR9XxfgFpYmjw",stay:80,p:"064-752-3001",d:"매일 열리는 제주 최대 상설시장. 한치·갈치·옥돔 등 수산 점포가 가장 많아 한치를 확실히 구할 수 있는 곳입니다. 흑돼지 정육점도 있어 고기까지 한 번에 삽니다. 오후 6시 넘으면 야시장 노점이 열립니다.",w:"매일 08:00–21:00 · 주변 유료주차"},
+{id:"m4",n:"서귀포매일올레시장",r:4.1,cat:"market",addr:"서귀포시 중앙로62번길 18",lat:33.2487163,lng:126.5640617,pid:"ChIJQTsLr51TDDURbGXJg1JM0Sk",stay:70,p:"064-762-1949",d:"매일 열리는 서귀포 최대 시장, 점포 200곳 이상. 살아있는 활어와 해산물 좌판이 강점입니다. 다만 기념품·감귤 노점은 관광지 가격이라는 후기가 있으니 수산물과 농산물 위주로 보세요.",w:"매일 07:00–21:00"},
+{id:"m5",n:"제주민속오일시장",r:4.2,cat:"market",mdays:[2,7],addr:"제주시 오일장서길 26",lat:33.4969018,lng:126.4753936,pid:"ChIJqddPRfv6DDURXlOma7QfJSw",stay:80,p:"064-743-5985",d:"전국 최대 규모 오일장. 관광시장이 아니라 생선·정육·채소가 현지 가격입니다. 수산물, 건어물, 농산물이 모두 있고 실내라 비가 와도 괜찮습니다. 주차 무료, 공항에서 10분.",w:"07:00–18:00 · 주차 무료"}
 ];
 
 /* ═══════════ LPG ═══════════ */
@@ -249,24 +265,56 @@ function gDir(a,b){
   if(b.pid) u+="&destination_place_id="+b.pid;
   return u;
 }
-function gRoute(list){
-  var pts=[BASE].concat(list,[BASE]);
-  var o=pts[0], d=pts[pts.length-1], mid=pts.slice(1,-1);
-  var u="https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(target(o))
-    +"&destination="+encodeURIComponent(target(d))+"&travelmode=driving";
-  if(mid.length){
-    u+="&waypoints="+mid.map(function(p){return encodeURIComponent(target(p))}).join("%7C");
-    if(mid.every(function(p){return !!p.pid}))
-      u+="&waypoint_place_ids="+mid.map(function(p){return p.pid}).join("%7C");
-  }
-  return u;
+function gRoute(origin,list){
+  if(!list.length) return gPlace(origin);
+  var segs=[origin].concat(list).map(function(p){
+    var nm=p.n.replace(/\s*\([^)]*\)/g,"").trim();
+    return encodeURIComponent(p.addr ? (p.addr+" "+nm) : nm);
+  });
+  return "https://www.google.com/maps/dir/"+segs.join("/");
+}
+/* 주소 인식 실패 대비 좌표 경로 (항상 계산됨) */
+function gRouteXY(origin,list){
+  var segs=[origin].concat(list).map(function(p){
+    return p.lat.toFixed(6)+","+p.lng.toFixed(6);
+  });
+  return "https://www.google.com/maps/dir/"+segs.join("/");
 }
 
-/* ═══════════ 상태 · 저장 ═══════════ */
+/* ═══════════ 여행 일정 · 장날 ═══════════ */
+var TRIP={label:"2026년 8월 21~23일",days:[[21,"금"],[22,"토"],[23,"일"]]};
+function marketInfo(p){
+  if(!p.mdays) return {cycle:"상설 · 매일 열림", open:"여행 3일 내내 이용 가능", ok:true};
+  var all=[]; for(var d=1;d<=31;d++){ if(p.mdays.indexOf(d%10)>=0) all.push(d); }
+  var hit=TRIP.days.filter(function(x){ return p.mdays.indexOf(x[0]%10)>=0; });
+  return {
+    cycle:"오일장 · 매월 "+p.mdays.join("·")+"일로 끝나는 날 ("+all.join(", ")+"일)",
+    open: hit.length ? "여행 중 개장: "+hit.map(function(x){return "8/"+x[0]+"("+x[1]+")"}).join(", ")
+                     : "여행 기간(8/21~23)에는 열리지 않습니다",
+    ok: hit.length>0
+  };
+}
+
 var CAT={sight:{label:"명소",color:"#5CC9C1"},cafe:{label:"카페",color:"#F0928D"},
- food:{label:"맛집",color:"#8FB8F0"},car:{label:"렌터카",color:"#B79BE0"},lpg:{label:"LPG",color:"#FFC24D"}};
+ food:{label:"맛집",color:"#8FB8F0"},market:{label:"시장",color:"#A9BE6E"},
+ car:{label:"교통",color:"#B79BE0"},lpg:{label:"LPG",color:"#FFC24D"}};
 var DAYC=["#5CC9C1","#8FB8F0","#F0928D"];
-var VIEWS={east:[455,55,405,400],south:[250,200,420,290],all:[0,0,860,490]};
+
+var VBFULL=[0,0,W,H], MINW=45, MAXW=W*1.15;
+function clampVB(v){
+  var w=Math.max(MINW,Math.min(MAXW,v[2])), h=w*H/W;
+  var x=Math.max(-W*0.25,Math.min(W*1.25-w,v[0])), y=Math.max(-H*0.25,Math.min(H*1.25-h,v[1]));
+  return [x,y,w,h];
+}
+function fitTo(pts,pad){
+  if(!pts.length){ return VBFULL.slice(); }
+  var xs=pts.map(function(p){return px(p.lng)}), ys=pts.map(function(p){return py(p.lat)});
+  var x0=Math.min.apply(null,xs)-pad, x1=Math.max.apply(null,xs)+pad;
+  var y0=Math.min.apply(null,ys)-pad, y1=Math.max.apply(null,ys)+pad;
+  var w=x1-x0, h=y1-y0, ar=W/H;
+  if(w/h < ar){ var nw=h*ar; x0-=(nw-w)/2; w=nw; } else { var nh=w/ar; y0-=(nh-h)/2; h=nh; }
+  return clampVB([x0,y0,w,h]);
+}
 var KEY="jeju-trip-v4";
 
 var mem={};
@@ -280,8 +328,8 @@ function save(){
   try{ localStorage.setItem(KEY,JSON.stringify(v)); }catch(e){ mem[KEY]=v; }
 }
 
-var S={view:"all",day:0,sel:null,form:null,
- filt:{sight:1,cafe:1,food:1,car:1,lpg:1},
+var S={vb:VBFULL.slice(),day:0,sel:null,form:null,insertAt:null,onlyPicked:false,
+ filt:{sight:1,cafe:1,food:1,market:1,car:1,lpg:1},
  course:[[],[],[]],custom:[],edits:{},removed:[]};
 var saved=load();
 if(saved){ S.course=saved.course||[[],[],[]]; S.custom=saved.custom||[];
@@ -291,7 +339,7 @@ function allPlaces(){
   var base=SEED.concat(S.custom).map(function(p){
     return S.edits[p.id] ? Object.assign({},p,S.edits[p.id]) : p;
   });
-  return base.concat(LPG).filter(function(p){ return S.removed.indexOf(p.id)<0; });
+  return [AIRPORT,BASE].concat(base,LPG).filter(function(p){ return S.removed.indexOf(p.id)<0; });
 }
 function byId(id){ var a=allPlaces(); for(var i=0;i<a.length;i++) if(a[i].id===id) return a[i]; return null; }
 function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
@@ -299,7 +347,7 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){
 
 /* ═══════════ 지도 ═══════════ */
 function renderMap(){
-  var vb=VIEWS[S.view], R=Math.max(7,vb[2]/48), HIT=R*2.6;
+  var vb=S.vb, R=Math.max(5,vb[2]/40), HIT=Math.max(R*2.6,vb[2]/22);
   var list=allPlaces().filter(function(p){return S.filt[p.cat]});
   var cur=S.course[S.day];
   var g='';
@@ -311,13 +359,16 @@ function renderMap(){
     g+='<circle cx="'+px(126.533)+'" cy="'+py(33.361)+'" r="'+r+'" fill="none" stroke="rgba(62,143,134,.3)" stroke-width="'+(i===3?vb[2]/600:vb[2]/900)+'"/>';
   });
 
-  S.course.forEach(function(ids,di){
-    if(!ids.length) return;
-    var pts=[BASE].concat(ids.map(byId).filter(Boolean),[BASE]);
+  var org=originOf(S.day);
+  if(cur.length){
+    var pts=[org].concat(cur.map(byId).filter(Boolean));
     g+='<polyline points="'+pts.map(function(p){return px(p.lng)+","+py(p.lat)}).join(" ")+'" fill="none" stroke="'
-      +DAYC[di]+'" stroke-width="'+(vb[2]/230)+'" stroke-opacity="'+(di===S.day?.95:.3)
-      +'" stroke-dasharray="'+(vb[2]/120)+' '+(vb[2]/160)+'" stroke-linecap="round"/>';
-  });
+      +DAYC[S.day]+'" stroke-width="'+(vb[2]/230)+'" stroke-opacity=".95"'
+      +' stroke-dasharray="'+(vb[2]/120)+' '+(vb[2]/160)+'" stroke-linecap="round"/>';
+  }
+
+  if(S.onlyPicked) list=list.filter(function(p){ return cur.indexOf(p.id)>=0 || p.id===org.id; });
+  list=list.filter(function(p){ return p.id!=="base"; });
 
   list.forEach(function(p){
     var idx=cur.indexOf(p.id), isSel=S.sel===p.id;
@@ -333,24 +384,32 @@ function renderMap(){
       g+='<circle cx="'+X+'" cy="'+Y+'" r="'+(isSel?R*1.3:R)+'" fill="'+c+'" stroke="'+(isSel?"#fff":"rgba(13,31,38,.45)")+'" stroke-width="'+(isSel?R*.28:R*.1)+'"/>';
       if(idx>=0) g+='<text x="'+X+'" y="'+(Y+R*.38)+'" font-size="'+(R*1.1)+'" text-anchor="middle" fill="#0D1F26" style="pointer-events:none;font-weight:600" class="mono">'+(idx+1)+'</text>';
     }
-    if(isSel) g+='<text x="'+X+'" y="'+(Y-R*1.9)+'" font-size="'+(R*1.5)+'" text-anchor="middle" fill="#fff" style="pointer-events:none">'+esc(p.n)+'</text>';
+    if(isSel||(S.onlyPicked&&idx>=0)){
+      var ly = (idx%2===1) ? (Y+R*2.9) : (Y-R*2.0);
+      g+='<text x="'+X+'" y="'+ly+'" font-size="'+(R*1.3)+'" text-anchor="middle" fill="#fff" stroke="#0D1F26" stroke-width="'+(R*.45)+'" paint-order="stroke" style="pointer-events:none">'+esc(p.n)+'</text>';
+    }
     g+='</g>';
   });
 
-  var BX=px(BASE.lng), BY=py(BASE.lat);
-  g+='<g class="pin" data-id="base" style="cursor:pointer">'
-    +'<circle cx="'+BX+'" cy="'+BY+'" r="'+HIT+'" fill="transparent"/>'
-    +'<circle cx="'+BX+'" cy="'+BY+'" r="'+(R*1.8)+'" fill="none" stroke="#fff" stroke-width="'+(R*.1)+'" stroke-opacity=".55"/>'
-    +'<circle cx="'+BX+'" cy="'+BY+'" r="'+(R*.9)+'" fill="#fff" stroke="#0D1F26" stroke-width="'+(R*.18)+'"/>'
-    +'<text x="'+BX+'" y="'+(BY-R*2.6)+'" font-size="'+(R*1.5)+'" text-anchor="middle" fill="#fff" style="pointer-events:none">숙소</text></g>';
+  var BX=px(BASE.lng), BY=py(BASE.lat), bIdx=cur.indexOf("base");
+  if(!S.onlyPicked || S.day>0 || bIdx>=0){
+    g+='<g class="pin" data-id="base" style="cursor:pointer">'
+      +'<circle cx="'+BX+'" cy="'+BY+'" r="'+HIT+'" fill="transparent"/>'
+      +'<circle cx="'+BX+'" cy="'+BY+'" r="'+(R*1.8)+'" fill="none" stroke="#fff" stroke-width="'+(R*.1)+'" stroke-opacity=".55"/>'
+      +'<circle cx="'+BX+'" cy="'+BY+'" r="'+(R*.9)+'" fill="#fff" stroke="#0D1F26" stroke-width="'+(R*.18)+'"/>'
+      +(bIdx>=0?'<text x="'+BX+'" y="'+(BY+R*.38)+'" font-size="'+(R*1.1)+'" text-anchor="middle" fill="#0D1F26" style="pointer-events:none;font-weight:600">'+(bIdx+1)+'</text>':'')
+      +'<text x="'+BX+'" y="'+(BY-R*2.6)+'" font-size="'+(R*1.5)+'" text-anchor="middle" fill="#fff" stroke="#0D1F26" stroke-width="'+(R*.45)+'" paint-order="stroke" style="pointer-events:none">숙소</text></g>';
+  }
 
   return '<div class="mapwrap"><svg viewBox="'+vb.join(" ")+'" preserveAspectRatio="xMidYMid meet">'
     +'<defs><radialGradient id="sg" cx="50%" cy="45%" r="75%"><stop offset="0%" stop-color="#16333D"/><stop offset="100%" stop-color="#0B1A20"/></radialGradient>'
     +'<linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#EFEBDD"/><stop offset="100%" stop-color="#DBD5C3"/></linearGradient></defs>'
     +g+'</svg><div class="zoom">'
-    +[["all","전체"],["east","동부"],["south","남부"]].map(function(v){
-      return '<button data-view="'+v[0]+'" aria-pressed="'+(S.view===v[0])+'">'+v[1]+'</button>'}).join("")
-    +'</div></div>';
+    +'<button data-zoom="in">＋</button>'
+    +'<button data-zoom="out">－</button>'
+    +'<button data-zoom="fit">코스</button>'
+    +'<button data-zoom="all">전체</button>'
+    +'</div><div class="maphint mono">두 손가락으로 확대 · 끌어서 이동</div></div>';
 }
 
 /* ═══════════ 폼 ═══════════ */
@@ -395,12 +454,16 @@ function renderCard(){
       +" · 숙소에서 약 "+fhm(mins(BASE,o)))+'</div>';
   if(o.d) h+='<p class="desc">'+esc(o.d)+'</p>';
   if(o.id==="base") h+='<p class="desc">표선면 하천리. 번영로가 바로 옆이라 제주시·공항 접근이 좋습니다.</p>';
+  if(o.cat==="market"){
+    var mi=marketInfo(o);
+    h+='<div class="mkt'+(mi.ok?"":" no")+'"><b class="mono">'+esc(mi.cycle)+'</b><span class="mono">'+esc(mi.open)+'</span></div>';
+  }
   if(o.w) h+='<div class="warn mono">'+esc(o.w)+'</div>';
   if(o.approx) h+='<div class="warn mono">'+esc(o.area)+' 부근에 찍힌 대략 위치입니다. 수정에서 좌표를 넣으면 정확해집니다.</div>';
   h+='<div class="acts">';
-  if(o.id!=="base"&&o.cat!=="lpg")
+  if(true)
     h+= added ? '<button class="b danger" data-act="del" data-id="'+o.id+'">DAY '+(S.day+1)+'에서 빼기</button>'
-              : '<button class="b pri" data-act="add" data-id="'+o.id+'">DAY '+(S.day+1)+'에 추가</button>';
+              : '<button class="b pri" data-act="add" data-id="'+o.id+'">DAY '+(S.day+1)+' 맨 뒤에 추가</button>';
   h+='<a class="b" target="_blank" rel="noopener" href="'+gPlace(o)+'">구글맵</a>';
   if(o.id!=="base") h+='<a class="b" target="_blank" rel="noopener" href="'+gDir(BASE,o)+'">길찾기 (소요시간)</a>';
   if(o.p) h+='<a class="b" href="tel:'+o.p.replace(/-/g,"")+'">전화</a>';
@@ -413,12 +476,12 @@ function renderCard(){
 /* ═══════════ 전체 렌더 ═══════════ */
 function render(){
   var list=allPlaces(), cur=S.course[S.day];
+  var org=originOf(S.day);
   var shown=list.filter(function(p){return S.filt[p.cat]});
   var stops=cur.map(byId).filter(Boolean);
-  var pts=[BASE].concat(stops);
+  var pts=[org].concat(stops);
   var legs=pts.slice(1).map(function(p,i){return {m:mins(pts[i],p),k:roadKm(pts[i],p)}});
-  var back=stops.length?{m:mins(stops[stops.length-1],BASE),k:roadKm(stops[stops.length-1],BASE)}:null;
-  var drive=legs.reduce(function(a,l){return a+l.m},0)+(back?back.m:0);
+  var drive=legs.reduce(function(a,l){return a+l.m},0);
   var stay=stops.reduce(function(a,p){return a+(parseInt(p.stay,10)||30)},0);
 
   var h='';
@@ -440,17 +503,24 @@ function render(){
     h+='<button class="day" data-day="'+i+'" aria-pressed="'+(S.day===i)+'" style="'+(S.day===i?"background:"+DAYC[i]:"")+'">DAY '+(i+1)
       +(S.course[i].length?' · '+S.course[i].length:'')+'</button>';
   });
-  h+='</div><div class="body">';
+  h+='</div>';
+  h+='<div class="onlybar"><button class="chip" data-act="only" aria-pressed="'+S.onlyPicked+'" style="'
+    +(S.onlyPicked?"background:"+DAYC[S.day]:"")+'">'+(S.onlyPicked?"✓ ":"")+'DAY '+(S.day+1)+' 선택한 곳만 지도에 보기</button></div>';
+  h+='<div class="body">';
 
   if(S.form) h+=renderForm();
   else if(S.sel) h+=renderCard();
   else h+='<p class="empty">지도의 점이나 아래 목록을 눌러 장소를 고르고,<br>「DAY '+(S.day+1)+'에 추가」를 누르면 경로가 이어집니다.</p>';
 
-  h+='<div class="h mono">DAY '+(S.day+1)+' 코스</div>';
-  if(!stops.length) h+='<p class="empty">아직 비어 있습니다.</p>';
+  h+='<div class="h mono">DAY '+(S.day+1)+' 코스 · 8/'+TRIP.days[S.day][0]+'('+TRIP.days[S.day][1]+') · '+esc(org.n)+' 출발</div>';
+  if(S.insertAt!==null)
+    h+='<div class="insbar"><span>'+(S.insertAt+1)+'번 자리에 넣을 장소를 아래에서 고르세요</span>'
+      +'<button class="b" data-act="inscancel">취소</button></div>';
+  if(!stops.length) h+='<p class="empty">아직 비어 있습니다.<br>'+esc(org.n)+'에서 출발하는 코스를 만들어 보세요.</p>';
   else{
-    h+='<div class="leg mono">숙소 출발</div>';
+    h+='<div class="leg mono start">◉ '+esc(org.n)+' 출발</div>';
     stops.forEach(function(p,i){
+      h+='<button class="ins" data-act="insertat" data-i="'+i+'">＋ '+(i+1)+'번 자리에 끼우기</button>';
       h+='<div class="leg mono">▼ 약 '+fhm(legs[i].m)+' · '+fkm(legs[i].k)+'</div>';
       h+='<div class="row" style="cursor:default"><span class="dot" style="background:'+DAYC[S.day]+'">'+(i+1)+'</span>'
         +'<span style="flex:1;min-width:0;cursor:pointer" data-act="sel" data-id="'+p.id+'">'
@@ -460,10 +530,11 @@ function render(){
         +'<button class="ord" data-act="down" data-i="'+i+'">↓</button>'
         +'<button class="ord" data-act="del" data-id="'+p.id+'">×</button></span></div>';
     });
-    h+='<div class="leg mono">▼ 약 '+fhm(back.m)+' · '+fkm(back.k)+'</div><div class="leg mono">숙소 도착</div>';
+    h+='<button class="ins" data-act="insertat" data-i="'+stops.length+'">＋ 맨 뒤에 추가</button>';
     h+='<div class="sum"><b>이동 '+fhm(drive)+' + 체류 '+fhm(stay)+'</b>'
-      +'<span>합계 약 '+fhm(drive+stay)+' · 총 '+fkm(legs.reduce(function(a,l){return a+l.k},0)+back.k)+'</span></div>';
-    h+='<div class="acts"><a class="b pri" target="_blank" rel="noopener" href="'+gRoute(stops)+'">구글맵에서 전체 경로 열기</a>'
+      +'<span>합계 약 '+fhm(drive+stay)+' · 총 '+fkm(legs.reduce(function(a,l){return a+l.k},0))+' · 마지막 지점까지</span></div>';
+    h+='<div class="acts"><a class="b pri" target="_blank" rel="noopener" href="'+gRoute(org,stops)+'">구글맵에서 전체 경로 열기</a>'
+      +'<a class="b" target="_blank" rel="noopener" href="'+gRouteXY(org,stops)+'">좌표로 열기</a>'
       +'<button class="b" data-act="clear">비우기</button></div>';
   }
 
@@ -473,10 +544,12 @@ function render(){
     .sort(function(a,b){return a.m-b.m})
     .forEach(function(x){
       var i=cur.indexOf(x.p.id);
-      h+='<button class="row" data-act="sel" data-id="'+x.p.id+'">'
+      var extra="";
+      if(x.p.cat==="market"){ var mi=marketInfo(x.p); extra=" · "+(x.p.mdays?x.p.mdays.join("·")+"일":"상설")+(mi.ok?"":" (기간 중 휴장)"); }
+      h+='<button class="row'+(x.p.cat==="market"&&!marketInfo(x.p).ok?" dim":"")+'" data-act="sel" data-id="'+x.p.id+'">'
         +'<span class="dot'+(x.p.cat==="car"||x.p.cat==="lpg"?" sq":"")+'" style="background:'+CAT[x.p.cat].color+'">'+(i>=0?i+1:"")+'</span>'
         +'<span style="flex:1;min-width:0"><span class="n">'+esc(x.p.n)+(x.p.user?" ✎":"")+'</span>'
-        +'<span class="m mono">'+(x.p.r?"★"+x.p.r+" · ":"")+CAT[x.p.cat].label+(x.p.approx?" · 위치 대략":"")+'</span></span>'
+        +'<span class="m mono">'+(x.p.r?"★"+x.p.r+" · ":"")+CAT[x.p.cat].label+extra+(x.p.approx?" · 위치 대략":"")+'</span></span>'
         +'<span class="rt mono">차로<br>'+fhm(x.m)+'</span></button>';
     });
 
@@ -503,6 +576,57 @@ function render(){
   h+='</div>';
 
   document.getElementById("app").innerHTML=h;
+  bindMap();
+}
+
+/* ═══════════ 지도 확대 · 이동 ═══════════ */
+function bindMap(){
+  var svg=document.querySelector(".mapwrap svg"); if(!svg) return;
+  var st=null, moved=false, md=null;
+  function d2(t){ var dx=t[0].clientX-t[1].clientX, dy=t[0].clientY-t[1].clientY; return Math.sqrt(dx*dx+dy*dy); }
+  svg.addEventListener("touchstart",function(e){
+    moved=false;
+    if(e.touches.length===1) st={m:1,x:e.touches[0].clientX,y:e.touches[0].clientY,vb:S.vb.slice()};
+    else if(e.touches.length===2) st={m:2,d:d2(e.touches),vb:S.vb.slice(),
+      cx:(e.touches[0].clientX+e.touches[1].clientX)/2, cy:(e.touches[0].clientY+e.touches[1].clientY)/2};
+  },{passive:true});
+  svg.addEventListener("touchmove",function(e){
+    if(!st) return;
+    var r=svg.getBoundingClientRect();
+    if(st.m===1&&e.touches.length===1){
+      var dx=(e.touches[0].clientX-st.x)/r.width*st.vb[2];
+      var dy=(e.touches[0].clientY-st.y)/r.height*st.vb[3];
+      if(Math.abs(dx)+Math.abs(dy)>1.5) moved=true;
+      if(moved){ S.vb=clampVB([st.vb[0]-dx, st.vb[1]-dy, st.vb[2], st.vb[3]]);
+        svg.setAttribute("viewBox",S.vb.join(" ")); e.preventDefault(); }
+    } else if(st.m===2&&e.touches.length===2){
+      moved=true;
+      var f=d2(e.touches)/st.d;
+      var pxx=st.vb[0]+(st.cx-r.left)/r.width*st.vb[2], pyy=st.vb[1]+(st.cy-r.top)/r.height*st.vb[3];
+      var nw=st.vb[2]/f, nh=st.vb[3]/f;
+      var rx=(pxx-st.vb[0])/st.vb[2], ry=(pyy-st.vb[1])/st.vb[3];
+      S.vb=clampVB([pxx-rx*nw, pyy-ry*nh, nw, nh]);
+      svg.setAttribute("viewBox",S.vb.join(" ")); e.preventDefault();
+    }
+  },{passive:false});
+  svg.addEventListener("touchend",function(){ if(st&&moved) render(); st=null; });
+  svg.addEventListener("wheel",function(e){
+    e.preventDefault();
+    var r=svg.getBoundingClientRect(), f=e.deltaY<0?1.25:1/1.25;
+    var pxx=S.vb[0]+(e.clientX-r.left)/r.width*S.vb[2], pyy=S.vb[1]+(e.clientY-r.top)/r.height*S.vb[3];
+    var nw=S.vb[2]/f, nh=S.vb[3]/f;
+    var rx=(pxx-S.vb[0])/S.vb[2], ry=(pyy-S.vb[1])/S.vb[3];
+    S.vb=clampVB([pxx-rx*nw, pyy-ry*nh, nw, nh]); render();
+  },{passive:false});
+  svg.addEventListener("mousedown",function(e){ md={x:e.clientX,y:e.clientY,vb:S.vb.slice(),moved:false}; });
+  window.addEventListener("mousemove",function(e){
+    if(!md) return; var r=svg.getBoundingClientRect();
+    if(Math.abs(e.clientX-md.x)+Math.abs(e.clientY-md.y)>3) md.moved=true;
+    if(!md.moved) return;
+    S.vb=clampVB([md.vb[0]-(e.clientX-md.x)/r.width*md.vb[2], md.vb[1]-(e.clientY-md.y)/r.height*md.vb[3], md.vb[2], md.vb[3]]);
+    svg.setAttribute("viewBox",S.vb.join(" "));
+  });
+  window.addEventListener("mouseup",function(){ if(md&&md.moved){ md=null; render(); } else md=null; });
 }
 
 /* ═══════════ 이벤트 ═══════════ */
@@ -535,14 +659,48 @@ document.addEventListener("click",function(e){
   var t=e.target.closest("[data-view],[data-filt],[data-day],[data-cat],[data-act],.pin");
   if(!t) return;
 
-  if(t.dataset.view){ S.view=t.dataset.view; render(); return; }
+  if(t.dataset.zoom){
+    var z=t.dataset.zoom, c=[originOf(S.day)].concat(S.course[S.day].map(byId).filter(Boolean));
+    if(z==="all") S.vb=VBFULL.slice();
+    else if(z==="fit") S.vb=fitTo(c.length>1?c:allPlaces(),c.length>1?40:0);
+    else {
+      var f=(z==="in")?1.5:1/1.5, v=S.vb, nw=v[2]/f, nh=v[3]/f;
+      S.vb=clampVB([v[0]+(v[2]-nw)/2, v[1]+(v[3]-nh)/2, nw, nh]);
+    }
+    render(); return;
+  }
   if(t.dataset.filt){ S.filt[t.dataset.filt]=!S.filt[t.dataset.filt]; render(); return; }
-  if(t.dataset.day!==undefined && t.classList.contains("day")){ S.day=+t.dataset.day; render(); return; }
+  if(t.dataset.day!==undefined && t.classList.contains("day")){
+    S.day=+t.dataset.day; S.insertAt=null;
+    var cc=[originOf(S.day)].concat(S.course[S.day].map(byId).filter(Boolean));
+    if(cc.length>1) S.vb=fitTo(cc,40);
+    render(); return; }
   if(t.dataset.cat && S.form){ S.form.cat=t.dataset.cat; captureForm(); render(); return; }
-  if(t.classList.contains("pin")){ S.sel=t.dataset.id; S.form=null; render(); window.scrollTo({top:document.querySelector(".chips").offsetTop-10,behavior:"smooth"}); return; }
+  if(t.classList.contains("pin")){
+    var pid=t.dataset.id;
+    if(S.insertAt!==null && pid!=="base"){
+      var dd=S.course[S.day];
+      if(dd.indexOf(pid)<0){ dd.splice(S.insertAt,0,pid); S.insertAt=null; save(); render(); return; }
+    }
+    S.sel=pid; S.form=null; render();
+    window.scrollTo({top:document.querySelector(".chips").offsetTop-10,behavior:"smooth"}); return; }
 
   var a=t.dataset.act, id=t.dataset.id;
-  if(a==="sel"){ S.sel=id; S.form=null; render(); return; }
+  if(a==="insertat"){ S.insertAt=+t.dataset.i; S.sel=null; S.form=null; render();
+    var el=document.querySelector(".insbar"); if(el) el.scrollIntoView({behavior:"smooth",block:"center"}); return; }
+  if(a==="inscancel"){ S.insertAt=null; render(); return; }
+  if(a==="only"){
+    S.onlyPicked=!S.onlyPicked;
+    var cc=[originOf(S.day)].concat(S.course[S.day].map(byId).filter(Boolean));
+    S.vb = (S.onlyPicked && cc.length>1) ? fitTo(cc,40) : VBFULL.slice();
+    render(); return; }
+  if(a==="sel"){
+    if(S.insertAt!==null && id!=="base"){
+      var d=S.course[S.day];
+      if(d.indexOf(id)<0){ d.splice(S.insertAt,0,id); S.insertAt=null; save(); render(); return; }
+      alert("이미 코스에 있는 장소입니다. 순서를 바꾸려면 ↑↓ 버튼을 쓰세요."); return;
+    }
+    S.sel=id; S.form=null; render(); return; }
   if(a==="new"){ S.form={n:"",cat:"food",addr:"",stay:45,d:"",w:"",p:"",lat:"",lng:""}; S.sel=null; render(); return; }
   if(a==="cancel"){ S.form=null; render(); return; }
   if(a==="save"){ saveForm(); return; }
@@ -550,7 +708,10 @@ document.addEventListener("click",function(e){
     S.form={id:o.id,n:o.n,cat:o.cat,addr:o.addr||"",lat:o.lat,lng:o.lng,stay:o.stay,p:o.p||"",
       d:o.d||"",w:o.w||"",pid:o.pid,r:o.r,seed:SEED.some(function(s){return s.id===o.id})};
     render(); return; }
-  if(a==="add"){ if(S.course[S.day].indexOf(id)<0) S.course[S.day].push(id); save(); render(); return; }
+  if(a==="add"){ if(S.course[S.day].indexOf(id)<0) S.course[S.day].push(id);
+    var cc=[originOf(S.day)].concat(S.course[S.day].map(byId).filter(Boolean));
+    if(cc.length>1) S.vb=fitTo(cc,40);
+    save(); render(); return; }
   if(a==="del"){ S.course[S.day]=S.course[S.day].filter(function(x){return x!==id}); save(); render(); return; }
   if(a==="remove"){
     var p=byId(id);
